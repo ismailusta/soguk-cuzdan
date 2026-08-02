@@ -54,7 +54,15 @@ export default buildConfig({
       connectionString:
         process.env.DATABASE_URL ||
         "postgresql://postgres:postgres@localhost:5432/soguk_payload",
+      // Supabase / managed Postgres requires TLS
+      ...(process.env.NODE_ENV === "production" ||
+      process.env.DATABASE_SSL === "true"
+        ? { ssl: { rejectUnauthorized: false } }
+        : {}),
     },
+    // Create/update tables on boot (needed for first Supabase deploy).
+    // Set PAYLOAD_DATABASE_PUSH=false later once migrations are in place.
+    push: process.env.PAYLOAD_DATABASE_PUSH !== "false",
   }),
   sharp,
   // Admin panel UI language (Account → Language)

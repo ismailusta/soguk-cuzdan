@@ -1,0 +1,5 @@
+{
+  "usdToTry": 42,
+  "uahToUsd": 45,
+  "note": "TRY = (price_pcs USD) × usdToTry. price_pcs yoksa TRY = (UAH / uahToUsd) × usdToTry. Değiştirip npm run reprice çalıştır."
+}

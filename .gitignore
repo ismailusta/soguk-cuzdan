@@ -20,6 +20,10 @@
 # production
 /build
 
+# payload uploads
+/media
+/public/media
+
 # misc
 .DS_Store
 *.pem
@@ -32,6 +36,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# runtime order store
+/data/orders.json
+/data/rozetka-dumps/
+
+# leftover prisma (Payload uses Postgres now)
+/prisma.config.ts
+/prisma/
 
 # vercel
 .vercel
@@ -39,3 +52,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local AI / editor tooling
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
+AGENTS.md
+CLAUDE.md

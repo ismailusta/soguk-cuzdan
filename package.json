@@ -2,25 +2,47 @@
   "name": "soguk-cuzdan",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "payload": "payload",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "import:rozetka": "node scripts/import-rozetka.mjs",
+    "translate:products": "node scripts/translate-products.mjs",
+    "reprice": "node scripts/reprice.mjs",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:seed": "tsx scripts/seed-payload.ts",
+    "db:setup": "npm run db:up && npm run db:seed",
+    "test": "tsx --test src/lib/cryptomus.test.ts"
   },
   "dependencies": {
+    "@payloadcms/db-postgres": "^3.87.0",
+    "@payloadcms/next": "^3.87.0",
+    "@payloadcms/richtext-lexical": "^3.87.0",
+    "dotenv": "^17.4.2",
+    "graphql": "^16.14.2",
     "next": "16.2.12",
+    "payload": "^3.87.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sharp": "^0.31.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }

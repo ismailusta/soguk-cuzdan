@@ -1,26 +1,285 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: oklch(0.13 0.004 260);
+  --bg-nav: oklch(0.11 0.004 260);
+  --bg-elevated: oklch(0.16 0.005 260);
+  --bg-soft: oklch(0.15 0.005 260);
+  --bg-pill: oklch(0.19 0.006 260);
+  --fg: oklch(0.97 0.004 90);
+  --fg-muted: oklch(0.65 0.01 90);
+  --fg-dim: oklch(0.55 0.01 90);
+  --fg-faint: oklch(0.45 0.01 90);
+  --accent: #d4af6a;
+  --accent-ink: oklch(0.13 0.004 260);
+  --line: oklch(0.26 0.006 260 / 0.4);
+  --line-strong: oklch(0.32 0.006 260 / 0.6);
+  --success: oklch(0.72 0.16 150);
+  --danger: oklch(0.68 0.18 25);
+  --steel: oklch(0.55 0.01 90);
+  --amber: var(--accent);
+  --amber-soft: color-mix(in oklch, var(--accent) 22%, transparent);
+  --cyan: oklch(0.72 0.1 200);
+  --violet: oklch(0.55 0.08 280);
+  --glass-bg: oklch(0.16 0.005 260);
+  --glass-bg-strong: oklch(0.15 0.005 260);
+  --glass-border: var(--line);
+  --glass-highlight: rgba(255, 255, 255, 0.08);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-nav: var(--bg-nav);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-pill: var(--bg-pill);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-dim: var(--fg-dim);
+  --color-fg-faint: var(--fg-faint);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-steel: var(--steel);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-cyan: var(--cyan);
+  --color-violet: var(--violet);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-inter), Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  min-height: 100%;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.noir-shell {
+  position: relative;
+  min-height: 100%;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.06) 1.2px, transparent 1.2px),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px, 48px 48px, 48px 48px;
+  animation: networkDrift 40s linear infinite;
+  color: var(--fg);
+}
+
+@keyframes networkDrift {
+  0% {
+    background-position: 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 48px 48px, 48px 48px, 48px 48px;
+  }
+}
+
+@keyframes floatY {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes floatA {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-22px);
+  }
+}
+
+@keyframes floatB {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(18px);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes spin3d {
+  0% {
+    transform: perspective(700px) rotateY(0deg) rotateX(8deg);
+  }
+  100% {
+    transform: perspective(700px) rotateY(360deg) rotateX(8deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade {
+  animation: fadeIn 0.4s ease both;
+}
+
+.animate-rise {
+  animation: fadeInUp 0.6s ease both;
+}
+
+.delay-1 {
+  animation-delay: 0.12s;
+}
+.delay-2 {
+  animation-delay: 0.24s;
+}
+.delay-3 {
+  animation-delay: 0.36s;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 15px 28px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.03);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  transform: none;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  color: oklch(0.9 0.005 90);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 15px 28px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: oklch(0.17 0.005 260);
+}
+
+.input-field {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid oklch(0.28 0.006 260 / 0.5);
+  border-radius: 10px;
+  color: var(--fg);
+  padding: 13px 16px;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+}
+
+.input-field::placeholder {
+  color: var(--fg-faint);
+}
+
+.label {
+  display: block;
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-bottom: 6px;
+}
+
+.noir-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.search-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.search-bar input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: var(--fg);
+  font-size: 0.95rem;
+}
+
+.search-bar input::placeholder {
+  color: var(--fg-dim);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(0.3 0.006 260);
+  border-radius: 4px;
 }

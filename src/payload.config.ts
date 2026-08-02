@@ -33,6 +33,20 @@ if (
   );
 }
 
+function resolveDatabaseUrl(): string {
+  const raw =
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/soguk_payload";
+  // Supabase pooler + Node pg: avoid SELF_SIGNED_CERT_IN_CHAIN
+  if (/supabase\.com/i.test(raw) && !/[?&]sslmode=/i.test(raw)) {
+    return `${raw}${raw.includes("?") ? "&" : "?"}sslmode=no-verify`;
+  }
+  return raw;
+}
+
+const databaseUrl = resolveDatabaseUrl();
+const isSupabase = /supabase\.com/i.test(databaseUrl);
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -51,11 +65,9 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString:
-        process.env.DATABASE_URL ||
-        "postgresql://postgres:postgres@localhost:5432/soguk_payload",
-      // Supabase / managed Postgres requires TLS
-      ...(process.env.NODE_ENV === "production" ||
+      connectionString: databaseUrl,
+      ...(isSupabase ||
+      process.env.NODE_ENV === "production" ||
       process.env.DATABASE_SSL === "true"
         ? { ssl: { rejectUnauthorized: false } }
         : {}),

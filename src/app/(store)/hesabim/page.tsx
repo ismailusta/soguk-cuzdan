@@ -103,7 +103,7 @@ export default function AccountPage() {
         </div>
         <div className="flex-1">
           <div className="text-[17px] font-bold">
-            {user.name || "Noir"}
+            {user.name || "Kriptostore"}
           </div>
           <div className="mt-1 text-sm text-fg-dim">{user.email}</div>
         </div>

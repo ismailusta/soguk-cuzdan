@@ -4,6 +4,12 @@ import { CartProvider } from "@/components/CartProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { ProductsProvider } from "@/components/ProductsProvider";
+import {
+  BRAND_DESCRIPTION_TR,
+  BRAND_ICON_PATH,
+  BRAND_NAME,
+  siteUrl,
+} from "@/lib/brand";
 import { LocaleProvider } from "@/lib/i18n";
 
 const inter = Inter({
@@ -18,6 +24,15 @@ const mono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: BRAND_NAME,
+  url: siteUrl(),
+  description: BRAND_DESCRIPTION_TR,
+  logo: `${siteUrl()}${BRAND_ICON_PATH}`,
+};
+
 export default function StoreLayout({
   children,
 }: Readonly<{
@@ -30,6 +45,10 @@ export default function StoreLayout({
       className={`${inter.variable} ${mono.variable} h-full`}
     >
       <body className="min-h-full antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <div className="noir-shell flex min-h-full flex-col">
           <LocaleProvider>
             <AuthProvider>

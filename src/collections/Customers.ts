@@ -19,9 +19,9 @@ export const Customers: CollectionConfig = {
           process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
           "http://localhost:3000";
         const url = `${base}/sifre-yenile?token=${encodeURIComponent(token)}`;
-        return `<p>NOIR şifre sıfırlama</p><p><a href="${url}">${url}</a></p>`;
+        return `<p>Kriptostore şifre sıfırlama</p><p><a href="${url}">${url}</a></p>`;
       },
-      generateEmailSubject: () => "NOIR şifre sıfırlama",
+      generateEmailSubject: () => "Kriptostore şifre sıfırlama",
     },
   },
   access: {

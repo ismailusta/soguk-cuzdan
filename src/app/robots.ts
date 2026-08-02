@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/brand";
 
-const site =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+const site = siteUrl();
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -12,5 +11,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ["/admin/", "/api/"],
     },
     sitemap: `${site}/sitemap.xml`,
+    host: site.replace(/^https?:\/\//, ""),
   };
 }

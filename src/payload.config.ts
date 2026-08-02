@@ -9,6 +9,7 @@ import sharp from "sharp";
 
 import { Media } from "./collections/Media";
 import { Customers } from "./collections/Customers";
+import { HeroBanners } from "./collections/HeroBanners";
 import { Orders } from "./collections/Orders";
 import { Products } from "./collections/Products";
 import { Users } from "./collections/Users";
@@ -39,10 +40,10 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: "· NOIR",
+      titleSuffix: "· Kriptostore",
     },
   },
-  collections: [Users, Customers, Media, Products, Orders],
+  collections: [Users, Customers, Media, Products, Orders, HeroBanners],
   editor: lexicalEditor(),
   secret: payloadSecret,
   typescript: {

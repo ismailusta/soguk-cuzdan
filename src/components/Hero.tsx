@@ -1,120 +1,235 @@
 "use client";
 
 import Link from "next/link";
-import type { Product } from "@/lib/types";
-import { ProductVisual } from "./ProductVisual";
-import { useLocale, productName, productShort } from "@/lib/i18n";
+import { useEffect, useState } from "react";
+import type { HeroSlide } from "@/lib/hero";
+import { useLocale } from "@/lib/i18n";
 import { formatPrice } from "@/lib/money";
 
-export function Hero({ featured = [] }: { featured?: Product[] }) {
-  const { t, locale } = useLocale();
-  const heroProduct = featured[0];
+const TITLE_SIZE: Record<HeroSlide["titleSize"], string> = {
+  sm: "text-[clamp(1.6rem,4vw,2.2rem)]",
+  md: "text-[clamp(2rem,5vw,2.8rem)]",
+  lg: "text-[clamp(2.4rem,6vw,3.4rem)]",
+  xl: "text-[clamp(2.6rem,7vw,4.2rem)]",
+};
+
+const SUB_SIZE: Record<HeroSlide["subtitleSize"], string> = {
+  sm: "text-[13px] md:text-[14px]",
+  md: "text-[15px] md:text-[16px]",
+  lg: "text-[16px] md:text-[18px]",
+};
+
+const BADGE_TONE: Record<HeroSlide["badgeTone"], string> = {
+  accent: "bg-accent/25 text-accent",
+  success: "bg-success/25 text-success",
+  danger: "bg-danger/25 text-danger",
+  muted: "bg-white/15 text-fg",
+};
+
+const DEFAULT_FROM = "oklch(0.12 0.02 260)";
+const DEFAULT_TO = "oklch(0.16 0.04 80)";
+
+function pick(
+  locale: "tr" | "en",
+  tr?: string | null,
+  en?: string | null
+): string {
+  if (locale === "en" && en) return en;
+  return tr || en || "";
+}
+
+function titleLines(text: string): string[] {
+  return text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
+function FallbackSlide({ locale }: { locale: "tr" | "en" }): HeroSlide {
+  return {
+    id: "fallback",
+    title: locale === "en" ? "KRIPTOSTORE\nCOLLECTION" : "KRIPTOSTORE\nCOLLECTION",
+    subtitle:
+      locale === "en"
+        ? "Ledger, Trezor, SafePal and more — one store."
+        : "Ledger, Trezor, SafePal ve daha fazlası — tek mağaza.",
+    badge: locale === "en" ? "Collection" : "Koleksiyon",
+    badgeTone: "muted",
+    ctaLabel: locale === "en" ? "Browse catalog" : "Kataloğa git",
+    ctaHref: "/urunler",
+    showPrice: false,
+    product: null,
+    layout: "textOverlay",
+    titleSize: "xl",
+    subtitleSize: "md",
+    titleAlign: "center",
+    titleUppercase: true,
+    accentGlow: true,
+  };
+}
+
+/** All slides = full-bleed lifestyle banner (lwallet-style overlay). */
+export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
+  const { locale, t } = useLocale();
+  const slides =
+    banners.length > 0 ? banners : [FallbackSlide({ locale })];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    setIndex(0);
+  }, [slides.length]);
+
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 6500);
+    return () => window.clearInterval(id);
+  }, [slides.length]);
+
+  const slide = slides[index] ?? slides[0];
+  const title = pick(locale, slide.title, slide.titleEn);
+  const subtitle = pick(locale, slide.subtitle, slide.subtitleEn);
+  const badge = pick(locale, slide.badge, slide.badgeEn);
+  const ctaLabel =
+    pick(locale, slide.ctaLabel, slide.ctaLabelEn) || t.buyNow;
+  const secondaryLabel = pick(
+    locale,
+    slide.secondaryLabel,
+    slide.secondaryLabelEn
+  );
+
+  const productHref = slide.product
+    ? `/urun/${slide.product.slug}`
+    : undefined;
+  const ctaHref = slide.ctaHref || productHref || "/urunler";
+  const secondaryHref = slide.secondaryHref || "/urunler";
+
+  const from = slide.gradientFrom || DEFAULT_FROM;
+  const to = slide.gradientTo || DEFAULT_TO;
+  const lines = titleLines(title);
+  const alignCenter = slide.titleAlign !== "left";
 
   return (
-    <section className="animate-fade px-5 pt-8 pb-16 md:px-12 md:pt-10 md:pb-20">
-      <div className="mb-8 flex items-center justify-between">
-        <p className="text-[13px] tracking-[1px] text-[oklch(0.5_0.01_260)] uppercase">
-          Vitrin
-        </p>
-        <div className="flex gap-2.5">
-          <Link
-            href="/urunler"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-sm"
-            aria-label="Ara"
-          >
-            ⌕
-          </Link>
-          <Link
-            href="/sepet"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-sm"
-            aria-label="Sepet"
-          >
-            👜
-          </Link>
-        </div>
-      </div>
+    <section className="animate-fade w-full">
+      <div
+        className="relative w-full overflow-hidden border-b border-line"
+        style={{
+          background: `linear-gradient(135deg, ${from}, ${to})`,
+        }}
+      >
+        {/* Full-bleed image */}
+        {slide.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={slide.imageUrl}
+            alt=""
+            className="absolute inset-0 z-0 h-full w-full object-cover"
+          />
+        )}
 
-      <div className="mx-auto flex max-w-[1300px] flex-col items-center gap-12 lg:flex-row lg:gap-16">
-        <div className="animate-rise min-w-0 flex-1 lg:max-w-[460px]">
-          <p className="mb-5 text-[13px] font-semibold tracking-[2px] text-accent uppercase">
-            Noir · {t.heroEyebrow || "Soğuk Cüzdan"}
-          </p>
-          <h1 className="mb-5 text-[clamp(2.4rem,6vw,3.25rem)] leading-[1.08] font-bold tracking-[-1.5px]">
-            Varlıklarınıza
-            <br />
-            layık bir zarafet.
-          </h1>
-          <p className="mb-9 max-w-[460px] text-[17px] leading-relaxed text-fg-muted">
-            {heroProduct
-              ? productShort(heroProduct, locale) || t.heroBody
-              : t.heroBody}
-          </p>
-          <div className="flex flex-wrap gap-3.5">
-            <Link
-              href={heroProduct ? `/urun/${heroProduct.slug}` : "/urunler"}
-              className="btn-primary"
-            >
-              Şimdi Satın Al
-            </Link>
-            <Link href="/urunler" className="btn-ghost">
-              {t.ctaCatalog || "Katalog"}
-            </Link>
-          </div>
-        </div>
+        {/* Dark scrim for readable text */}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{
+            background: slide.imageUrl
+              ? "linear-gradient(180deg, rgba(8,10,14,0.55) 0%, rgba(8,10,14,0.72) 55%, rgba(8,10,14,0.85) 100%)"
+              : "transparent",
+          }}
+        />
 
-        <div className="relative flex h-[380px] w-full max-w-[380px] shrink-0 items-center justify-center md:h-[420px]">
+        {slide.accentGlow && (
           <div
-            className="absolute h-[320px] w-[320px] rounded-full blur-[40px] animate-[pulseGlow_4s_ease-in-out_infinite_alternate]"
+            className="pointer-events-none absolute inset-0 z-[1] opacity-40"
             style={{
               background:
-                "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
+                "radial-gradient(ellipse 50% 60% at 50% 40%, color-mix(in oklch, var(--accent) 18%, transparent), transparent 70%)",
             }}
           />
-          <div
-            className="absolute top-[6%] left-[-30px] flex h-[70px] w-[70px] items-center justify-center rounded-full text-2xl font-bold text-[#232a38] shadow-[0_14px_30px_rgba(0,0,0,0.55)]"
-            style={{
-              background:
-                "radial-gradient(circle at 35% 30%, #ffc768, #f7931a 60%, #b86b00)",
-              animation:
-                "spin3d 8s linear infinite, floatA 5.5s ease-in-out infinite alternate",
-            }}
+        )}
+
+        <div className="relative z-[2] mx-auto flex min-h-[420px] max-w-[900px] flex-col items-center justify-center px-5 py-16 text-center md:min-h-[520px] md:py-20">
+          {badge && (
+            <span
+              className={`mb-5 inline-flex rounded-full px-3.5 py-1 text-[11px] font-semibold tracking-[1.4px] uppercase ${BADGE_TONE[slide.badgeTone]}`}
+            >
+              {badge}
+            </span>
+          )}
+
+          <h1
+            className={`leading-[1.02] font-bold tracking-[-2px] text-fg ${TITLE_SIZE[slide.titleSize]} ${
+              slide.titleUppercase ? "uppercase" : ""
+            } ${alignCenter ? "" : "self-start text-left"}`}
           >
-            ₿
-          </div>
+            {lines.map((line, i) => (
+              <span key={`${slide.id}-${i}`} className="block">
+                {line}
+              </span>
+            ))}
+          </h1>
+
+          {subtitle && (
+            <p
+              className={`mt-5 max-w-lg whitespace-pre-line leading-relaxed text-fg-muted ${SUB_SIZE[slide.subtitleSize]} ${
+                alignCenter ? "" : "self-start text-left"
+              }`}
+            >
+              {subtitle}
+            </p>
+          )}
+
+          {slide.showPrice && slide.product && (
+            <p className="mt-5 text-2xl font-semibold tabular-nums text-accent">
+              {formatPrice(slide.product.price, slide.product.currency)}
+            </p>
+          )}
+
           <div
-            className="absolute right-[-20px] bottom-[8%] flex h-[46px] w-[46px] items-center justify-center rounded-full text-lg font-bold text-[#232a38] shadow-[0_8px_20px_rgba(0,0,0,0.4)]"
-            style={{
-              background:
-                "radial-gradient(circle at 35% 30%, #e3e9f2, #8f9bb3 60%, #4b5568)",
-              animation:
-                "spin3d 6.5s linear infinite reverse, floatB 4.5s ease-in-out infinite alternate",
-            }}
+            className={`mt-8 flex flex-wrap items-center gap-4 ${
+              alignCenter ? "justify-center" : "self-start"
+            }`}
           >
-            Ξ
-          </div>
-          <div className="relative animate-[floatY_6s_ease-in-out_infinite_alternate]">
-            {heroProduct ? (
-              <div className="h-[340px] w-[260px] overflow-hidden rounded-[24px] border border-line md:h-[380px] md:w-[280px]">
-                <ProductVisual product={heroProduct} className="h-full w-full" />
-              </div>
-            ) : (
-              <div className="flex h-[340px] w-[260px] items-center justify-center rounded-[24px] border border-line bg-bg-elevated px-6 text-center text-sm text-fg-dim md:h-[380px] md:w-[280px]">
-                Panelden “Anasayfada göster” işaretle
-              </div>
+            <Link
+              href={ctaHref}
+              className="btn-primary rounded-full px-8 py-3.5 text-sm font-bold tracking-wide uppercase"
+            >
+              {ctaLabel}
+            </Link>
+            {secondaryLabel && (
+              <Link
+                href={secondaryHref}
+                className="text-sm font-medium text-fg-dim underline-offset-4 hover:text-fg hover:underline"
+              >
+                {secondaryLabel}
+              </Link>
             )}
           </div>
+
+          {slides.length > 1 && (
+            <div
+              className="mt-12 flex gap-2"
+              role="tablist"
+              aria-label="Hero"
+            >
+              {slides.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === index}
+                  onClick={() => setIndex(i)}
+                  className={`h-2 rounded-full transition-all ${
+                    i === index
+                      ? "w-7 bg-accent"
+                      : "w-2 bg-fg-faint hover:bg-fg-dim"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {heroProduct && (
-        <p className="mx-auto mt-6 max-w-[1300px] text-center text-sm text-fg-dim md:text-left">
-          Vitrin ürünü:{" "}
-          <Link href={`/urun/${heroProduct.slug}`} className="text-accent">
-            {productName(heroProduct, locale)}
-          </Link>{" "}
-          · {formatPrice(heroProduct.price, heroProduct.currency)}
-        </p>
-      )}
     </section>
   );
 }

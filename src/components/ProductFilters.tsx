@@ -29,6 +29,8 @@ export function ProductFilters({
   useEffect(() => {
     const q = searchParams.get("q");
     if (q) setQuery(q);
+    const b = searchParams.get("brand");
+    if (b) setBrand(b);
   }, [searchParams]);
 
   const filtered = useMemo(() => {

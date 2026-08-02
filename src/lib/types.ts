@@ -8,6 +8,8 @@ export type Product = {
   shortDescriptionEn?: string;
   description: string;
   descriptionEn?: string;
+  detailSections?: { title: string; body: string }[];
+  faqs?: { question: string; answer: string }[];
   price: number;
   currency: string;
   features: string[];
@@ -21,6 +23,8 @@ export type Product = {
   sourceUrl?: string | null;
   featuredOnHome?: boolean;
   featuredOrder?: number;
+  detailSectionsEn?: { title: string; body: string }[];
+  faqsEn?: { question: string; answer: string }[];
 };
 
 export type CartItem = {

@@ -1,6 +1,6 @@
-# Soğuk Cüzdan
+# Kriptostore
 
-Türkiye için siyah temalı soğuk cüzdan mağazası. Ödemeler **Cryptomus** invoice API ile kripto üzerinden alınır.
+Türkiye için donanım kripto cüzdanı (soğuk cüzdan) mağazası. Marka: **Kriptostore**. Ödemeler **Cryptomus** invoice API ile kripto üzerinden alınır.
 
 ## Kurulum
 
@@ -10,7 +10,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-`.env.local` içine Cryptomus Merchant UUID ve Payment API key’inizi yazın. Production’da `NEXT_PUBLIC_SITE_URL` mutlaka public HTTPS adresiniz olmalı (webhook için).
+`.env.local` içine Cryptomus Merchant UUID ve Payment API key’inizi yazın. Production’da `NEXT_PUBLIC_SITE_URL` mutlaka public HTTPS adresiniz olmalı — örn. `https://kriptostore.com` (SEO, Open Graph, sitemap ve Cryptomus webhook için).
 
 ## Scriptler
 
@@ -20,6 +20,6 @@ npm run dev
 
 ## Notlar
 
-- Ürünler: `data/products.json`
-- Siparişler: `data/orders.json` (gitignore; runtime’da oluşur)
+- Ürünler: Payload CMS / PostgreSQL
 - Webhook: `POST /api/webhooks/cryptomus`
+- Sitemap: `/sitemap.xml` · Robots: `/robots.txt`

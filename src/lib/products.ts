@@ -35,9 +35,27 @@ function mediaUrl(image: PayloadProduct["image"]): string | undefined {
   return (image as MediaLike).url ?? undefined;
 }
 
+function galleryUrls(doc: PayloadProduct): string[] {
+  const gallery = doc.gallery;
+  if (!Array.isArray(gallery)) return [];
+  return gallery
+    .map((row) => {
+      const img = row?.image;
+      if (!img || typeof img === "number") return undefined;
+      return (img as MediaLike).url ?? undefined;
+    })
+    .filter((u): u is string => Boolean(u));
+}
+
 export function mapProduct(doc: PayloadProduct): Product {
   const name = pickLocale(doc.name as LocalizedString, "tr") || "";
   const nameEn = pickLocale(doc.name as LocalizedString, "en");
+  const cover = mediaUrl(doc.image) || doc.imageUrl || undefined;
+  const fromGallery = galleryUrls(doc);
+  const fromUrls = doc.images ?? [];
+  const images = [...fromGallery, ...fromUrls].filter(
+    (u, i, arr) => u && u !== cover && arr.indexOf(u) === i
+  ) as string[];
 
   return {
     id: String(doc.id),
@@ -60,8 +78,50 @@ export function mapProduct(doc: PayloadProduct): Product {
     inStock: Boolean(doc.inStock) && (doc.stockQty ?? 0) > 0,
     stockQty: typeof doc.stockQty === "number" ? doc.stockQty : 0,
     accent: doc.accent || "#9aa4b2",
-    image: mediaUrl(doc.image) || doc.imageUrl || undefined,
-    images: doc.images ?? [],
+    image: cover,
+    images,
+    detailSections: Array.isArray(doc.detailSections)
+      ? doc.detailSections
+          .filter((s) => s?.title && s?.body)
+          .map((s) => ({ title: String(s.title), body: String(s.body) }))
+      : [],
+    detailSectionsEn: (() => {
+      const raw = (doc as { detailSections?: unknown }).detailSections;
+      // when locale=all, localized arrays may be { tr, en }
+      if (raw && !Array.isArray(raw) && typeof raw === "object") {
+        const en = (raw as { en?: { title?: string; body?: string }[] }).en;
+        if (Array.isArray(en)) {
+          return en
+            .filter((s) => s?.title && s?.body)
+            .map((s) => ({ title: String(s.title), body: String(s.body) }));
+        }
+      }
+      return undefined;
+    })(),
+    faqs: Array.isArray(doc.faqs)
+      ? doc.faqs
+          .filter((f) => f?.question && f?.answer)
+          .map((f) => ({
+            question: String(f.question),
+            answer: String(f.answer),
+          }))
+      : [],
+    faqsEn: (() => {
+      const raw = (doc as { faqs?: unknown }).faqs;
+      if (raw && !Array.isArray(raw) && typeof raw === "object") {
+        const en = (raw as { en?: { question?: string; answer?: string }[] })
+          .en;
+        if (Array.isArray(en)) {
+          return en
+            .filter((f) => f?.question && f?.answer)
+            .map((f) => ({
+              question: String(f.question),
+              answer: String(f.answer),
+            }));
+        }
+      }
+      return undefined;
+    })(),
     sourcePriceUah: doc.sourcePriceUah ?? null,
     sourceUrl: doc.sourceUrl ?? null,
     featuredOnHome: Boolean(doc.featuredOnHome),
@@ -101,13 +161,77 @@ export async function getProductBySlug(
   slug: string
 ): Promise<Product | undefined> {
   const payload = await getPayloadClient();
-  const result = await payload.find({
-    ...productQuery,
-    where: { slug: { equals: slug } },
-    limit: 1,
-  });
-  const doc = result.docs[0];
-  return doc ? mapProduct(doc) : undefined;
+  const [trRes, enRes] = await Promise.all([
+    payload.find({
+      collection: "products",
+      where: { slug: { equals: slug } },
+      limit: 1,
+      depth: 1,
+      overrideAccess: true,
+      locale: "tr",
+    }),
+    payload.find({
+      collection: "products",
+      where: { slug: { equals: slug } },
+      limit: 1,
+      depth: 1,
+      overrideAccess: true,
+      locale: "en",
+    }),
+  ]);
+
+  const tr = trRes.docs[0];
+  if (!tr) return undefined;
+  const en = enRes.docs[0];
+
+  const product = mapProduct({
+    ...tr,
+    // keep localized name/desc shape for pickLocale in mapProduct
+    name: { tr: tr.name as string, en: (en?.name as string) || undefined },
+    shortDescription: {
+      tr: tr.shortDescription as string,
+      en: (en?.shortDescription as string) || undefined,
+    },
+    description: {
+      tr: tr.description as string,
+      en: (en?.description as string) || undefined,
+    },
+    features: {
+      tr: (tr.features as string[]) || [],
+      en: (en?.features as string[]) || [],
+    },
+  } as never);
+
+  const mapSections = (
+    rows: { title?: string | null; body?: string | null }[] | null | undefined
+  ) =>
+    Array.isArray(rows)
+      ? rows
+          .filter((s) => s?.title && s?.body)
+          .map((s) => ({ title: String(s.title), body: String(s.body) }))
+      : [];
+
+  const mapFaqs = (
+    rows:
+      | { question?: string | null; answer?: string | null }[]
+      | null
+      | undefined
+  ) =>
+    Array.isArray(rows)
+      ? rows
+          .filter((f) => f?.question && f?.answer)
+          .map((f) => ({
+            question: String(f.question),
+            answer: String(f.answer),
+          }))
+      : [];
+
+  product.detailSections = mapSections(tr.detailSections);
+  product.detailSectionsEn = mapSections(en?.detailSections);
+  product.faqs = mapFaqs(tr.faqs);
+  product.faqsEn = mapFaqs(en?.faqs);
+
+  return product;
 }
 
 export async function getProductById(
@@ -125,9 +249,24 @@ export async function getProductById(
   }
 }
 
-export async function getBrands(): Promise<string[]> {
-  const products = await getProducts();
-  return [...new Set(products.map((p) => p.brand))].sort();
+export async function getRelatedProducts(
+  brand: string,
+  excludeId: string,
+  limit = 8
+): Promise<Product[]> {
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    ...productQuery,
+    where: {
+      and: [
+        { brand: { equals: brand } },
+        { id: { not_equals: excludeId } },
+      ],
+    },
+    limit,
+    sort: "-updatedAt",
+  });
+  return result.docs.map(mapProduct);
 }
 
 export { formatPrice } from "@/lib/money";

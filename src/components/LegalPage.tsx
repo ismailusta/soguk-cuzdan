@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BRAND_NAME } from "@/lib/brand";
 import { useLocale } from "@/lib/i18n";
 
 type LegalKey = "privacy" | "terms" | "returns" | "kvkk";
@@ -13,7 +14,7 @@ const copy: Record<
     tr: {
       title: "Gizlilik politikası",
       body: [
-        "NOIR olarak sipariş ve hesap verilerinizi yalnızca siparişinizin işlenmesi, kargo ve yasal yükümlülükler için kullanırız.",
+        "Kriptostore olarak sipariş ve hesap verilerinizi yalnızca siparişinizin işlenmesi, kargo ve yasal yükümlülükler için kullanırız.",
         "Ödeme Cryptomus üzerinden gerçekleşir; kart veya cüzdan özel anahtarlarınız bizde tutulmaz.",
         "Verileriniz Payload CMS / PostgreSQL üzerinde saklanır; üçüncü taraflarla pazarlama amacıyla paylaşılmaz.",
         "İletişim: site üzerinden hesap e-postanız veya sipariş e-postanız ile bize ulaşabilirsiniz.",
@@ -22,7 +23,7 @@ const copy: Record<
     en: {
       title: "Privacy policy",
       body: [
-        "NOIR uses your order and account data only to process orders, shipping, and legal obligations.",
+        "Kriptostore uses your order and account data only to process orders, shipping, and legal obligations.",
         "Payments run via Cryptomus; we never store card details or your crypto private keys.",
         "Data is stored in Payload CMS / PostgreSQL and is not sold for marketing.",
         "Contact us using your account or order email.",
@@ -74,7 +75,7 @@ const copy: Record<
       title: "KVKK bilgilendirme",
       body: [
         "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında; ad, e-posta, telefon ve teslimat adresi sipariş süreçleri için işlenir.",
-        "Veri sorumlusu: NOIR mağaza işletmesi. Amaç: sözleşme ifası ve yasal zorunluluklar.",
+        "Veri sorumlusu: Kriptostore. Amaç: sözleşme ifası ve yasal zorunluluklar.",
         "Haklarınız: erişim, düzeltme, silme ve itiraz. Taleplerinizi kayıtlı e-posta adresiniz üzerinden iletebilirsiniz.",
         "Saklama süresi: sipariş ve muhasebe yükümlülükleri süresince; ardından silinir veya anonimleştirilir.",
       ],
@@ -83,7 +84,7 @@ const copy: Record<
       title: "Privacy notice (KVKK)",
       body: [
         "Under Turkish KVKK, name, email, phone and shipping address are processed for order fulfillment.",
-        "Controller: NOIR store operator. Purpose: contract performance and legal duties.",
+        "Controller: Kriptostore. Purpose: contract performance and legal duties.",
         "Your rights include access, correction, deletion and objection via your registered email.",
         "Retention follows order/accounting obligations, then deletion or anonymization.",
       ],
@@ -109,8 +110,8 @@ export function LegalPage({ kind }: { kind: LegalKey }) {
         ))}
       </div>
       <p className="mt-10">
-        <Link href="/" className="text-sm text-accent hover:underline">
-          ← NOIR
+        <Link href="/" className="inline-flex items-center text-sm text-accent hover:underline">
+          ← {BRAND_NAME}
         </Link>
       </p>
     </article>

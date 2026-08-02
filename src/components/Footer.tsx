@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BrandLogo } from "./BrandLogo";
 import { useLocale } from "@/lib/i18n";
 
 export function Footer() {
@@ -10,16 +11,7 @@ export function Footer() {
     <footer className="mt-auto border-t border-line bg-bg-nav">
       <div className="mx-auto flex max-w-[1300px] flex-col gap-8 px-5 py-12 md:flex-row md:justify-between md:px-12">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span
-              className="h-7 w-7 rounded-lg"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--accent), oklch(0.4 0.02 260))",
-              }}
-            />
-            <p className="text-xl font-bold tracking-[0.5px]">NOIR</p>
-          </div>
+          <BrandLogo size={52} className="[&_span]:text-xl" />
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-fg-muted">
             {t.footerBlurb}
           </p>
@@ -66,7 +58,7 @@ export function Footer() {
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-[1300px] px-5 py-4 text-xs text-fg-faint md:px-12">
-          © {new Date().getFullYear()} NOIR · {t.footerCopy}
+          © {new Date().getFullYear()} Kriptostore · {t.footerCopy}
         </p>
       </div>
     </footer>

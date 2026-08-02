@@ -1,13 +1,7 @@
 import { getPayloadClient } from "@/lib/payload";
 import type { Order } from "@/lib/types";
 import { formatPrice } from "@/lib/money";
-
-function siteUrl() {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000"
-  );
-}
+import { BRAND_NAME, siteUrl } from "@/lib/brand";
 
 async function sendMail(opts: {
   to: string;
@@ -47,7 +41,7 @@ Toplam: ${formatPrice(order.total, order.currency)}
 
   await sendMail({
     to: order.customer.email,
-    subject: `NOIR sipariş ${order.id}`,
+    subject: `${BRAND_NAME} sipariş ${order.id}`,
     text,
     html: `<p>Siparişiniz alındı: <strong>${order.id}</strong></p>
 <pre>${orderLines(order)}</pre>
@@ -67,7 +61,7 @@ Durum: ${link}
 
   await sendMail({
     to: order.customer.email,
-    subject: `NOIR ödeme onaylandı — ${order.id}`,
+    subject: `${BRAND_NAME} ödeme onaylandı — ${order.id}`,
     text,
     html: `<p>Ödemeniz alındı: <strong>${order.id}</strong></p>
 <p>Toplam: <strong>${formatPrice(order.total, order.currency)}</strong></p>
@@ -83,7 +77,7 @@ export async function sendOrderShippedEmail(order: Order) {
     : "Takip numarası yakında.";
   await sendMail({
     to: order.customer.email,
-    subject: `NOIR kargoda — ${order.id}`,
+    subject: `${BRAND_NAME} kargoda — ${order.id}`,
     text: `Siparişiniz kargoya verildi.\n${track}\n${link}`,
     html: `<p>Siparişiniz kargoya verildi: <strong>${order.id}</strong></p>
 <p>${track}</p>

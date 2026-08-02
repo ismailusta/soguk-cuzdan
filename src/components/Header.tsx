@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { BrandLogo } from "./BrandLogo";
 import { useAuth } from "./AuthProvider";
 import { useCart } from "./CartProvider";
 import { useLocale } from "@/lib/i18n";
@@ -93,15 +94,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg-nav">
       <div className="flex h-16 items-center gap-4 px-4 md:gap-8 md:px-8">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <span
-            className="h-7 w-7 rounded-lg"
-            style={{
-              background:
-                "linear-gradient(135deg, var(--accent), oklch(0.4 0.02 260))",
-            }}
-          />
-          <span className="text-lg font-bold tracking-[0.5px]">NOIR</span>
+        <Link href="/" className="flex shrink-0 items-center">
+          <BrandLogo size={44} priority />
         </Link>
 
         <nav className="relative hidden h-full items-center md:flex">

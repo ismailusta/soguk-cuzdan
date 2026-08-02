@@ -73,6 +73,7 @@ export interface Config {
     media: Media;
     products: Product;
     orders: Order;
+    'hero-banners': HeroBanner;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -85,6 +86,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    'hero-banners': HeroBannersSelect<false> | HeroBannersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -232,6 +234,23 @@ export interface Product {
   brand: string;
   shortDescription: string;
   description: string;
+  /**
+   * Örn. Cihaz hakkında, Kutuda ne var, Nasıl kullanılır
+   */
+  detailSections?:
+    | {
+        title: string;
+        body: string;
+        id?: string | null;
+      }[]
+    | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
   features?: string[] | null;
   price: number;
   currency: string;
@@ -251,7 +270,16 @@ export interface Product {
   accent?: string | null;
   image?: (number | null) | Media;
   /**
-   * Rozetka vb. uzak görseller için. Upload yoksa kullanılır.
+   * Kapak dışındaki ek ürün görselleri (Media’ya yüklenmiş).
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Upload yoksa kullanılır (eski Rozetka URL’leri).
    */
   imageUrl?: string | null;
   images?: string[] | null;
@@ -292,6 +320,65 @@ export interface Order {
     quantity: number;
     id?: string | null;
   }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Anasayfa hero slide’ları. Başlıkta Enter ile satır kır. Sıra: küçük sayı önce.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-banners".
+ */
+export interface HeroBanner {
+  id: number;
+  active?: boolean | null;
+  /**
+   * Küçük sayı önce gösterilir.
+   */
+  order?: number | null;
+  /**
+   * Her satır Enter ile kırılır. Örn:
+   * LEDGER
+   * STAX
+   */
+  title: string;
+  subtitle?: string | null;
+  /**
+   * Boş bırakılırsa rozet gösterilmez.
+   */
+  badge?: string | null;
+  badgeTone?: ('accent' | 'success' | 'danger' | 'muted') | null;
+  ctaLabel?: string | null;
+  /**
+   * Boşsa ürün seçiliyse /urun/slug, değilse /urunler
+   */
+  ctaHref?: string | null;
+  secondaryLabel?: string | null;
+  secondaryHref?: string | null;
+  image?: (number | null) | Media;
+  /**
+   * Upload yoksa kullanılır.
+   */
+  imageUrl?: string | null;
+  /**
+   * Görsel / fiyat / CTA link için yedek. Serbest alanlar önceliklidir.
+   */
+  product?: (number | null) | Product;
+  showPrice?: boolean | null;
+  /**
+   * Tüm slide’lar full-bleed arka plan + üstünde metin. Bu alan sadece hizayı etkiler.
+   */
+  layout: 'textOverlay' | 'textLeft' | 'textRight';
+  titleSize?: ('sm' | 'md' | 'lg' | 'xl') | null;
+  subtitleSize?: ('sm' | 'md' | 'lg') | null;
+  titleAlign?: ('left' | 'center') | null;
+  titleUppercase?: boolean | null;
+  /**
+   * hex veya oklch. Boş = varsayılan Kriptostore teması
+   */
+  gradientFrom?: string | null;
+  gradientTo?: string | null;
+  accentGlow?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -338,6 +425,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'hero-banners';
+        value: number | HeroBanner;
       } | null);
   globalSlug?: string | null;
   user:
@@ -470,6 +561,20 @@ export interface ProductsSelect<T extends boolean = true> {
   brand?: T;
   shortDescription?: T;
   description?: T;
+  detailSections?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        id?: T;
+      };
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
   features?: T;
   price?: T;
   currency?: T;
@@ -479,6 +584,12 @@ export interface ProductsSelect<T extends boolean = true> {
   featuredOrder?: T;
   accent?: T;
   image?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   imageUrl?: T;
   images?: T;
   sourcePriceUah?: T;
@@ -516,6 +627,36 @@ export interface OrdersSelect<T extends boolean = true> {
         quantity?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-banners_select".
+ */
+export interface HeroBannersSelect<T extends boolean = true> {
+  active?: T;
+  order?: T;
+  title?: T;
+  subtitle?: T;
+  badge?: T;
+  badgeTone?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  secondaryLabel?: T;
+  secondaryHref?: T;
+  image?: T;
+  imageUrl?: T;
+  product?: T;
+  showPrice?: T;
+  layout?: T;
+  titleSize?: T;
+  subtitleSize?: T;
+  titleAlign?: T;
+  titleUppercase?: T;
+  gradientFrom?: T;
+  gradientTo?: T;
+  accentGlow?: T;
   updatedAt?: T;
   createdAt?: T;
 }

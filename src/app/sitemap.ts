@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/brand";
 import { getPayloadClient } from "@/lib/payload";
 
-const site =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+const site = siteUrl();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [

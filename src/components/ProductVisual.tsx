@@ -5,12 +5,17 @@ export function ProductVisual({
   product,
   className = "",
   large = false,
+  src,
 }: {
   product: Product;
   className?: string;
   large?: boolean;
+  /** Override cover (gallery selection) */
+  src?: string | null;
 }) {
-  if (product.image) {
+  const imageSrc = src || product.image;
+
+  if (imageSrc) {
     return (
       <div
         className={`relative overflow-hidden bg-bg-soft ${className}`}
@@ -19,12 +24,17 @@ export function ProductVisual({
         }}
       >
         <Image
-          src={product.image}
+          src={imageSrc}
           alt={product.name}
           fill
-          sizes={large ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 33vw"}
+          sizes={
+            large
+              ? "(max-width: 768px) 100vw, 50vw"
+              : "(max-width: 768px) 50vw, 33vw"
+          }
           className="object-contain p-6 md:p-8"
           priority={large}
+          unoptimized={imageSrc.startsWith("/api/media") || imageSrc.startsWith("http://localhost")}
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-bg/80 to-transparent" />
       </div>

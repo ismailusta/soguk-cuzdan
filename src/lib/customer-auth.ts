@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 
-export const CUSTOMER_COOKIE = "noir-customer-token";
+export const CUSTOMER_COOKIE = "kriptostore-customer-token";
 export const ADMIN_COOKIE = "payload-token";
 
 export type CustomerProfile = {

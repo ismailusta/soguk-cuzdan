@@ -59,6 +59,31 @@ export const Products: CollectionConfig = {
       label: "Açıklama",
     },
     {
+      name: "detailSections",
+      type: "array",
+      label: "Detay bölümleri",
+      labels: { singular: "Bölüm", plural: "Bölümler" },
+      localized: true,
+      fields: [
+        { name: "title", type: "text", required: true, label: "Başlık" },
+        { name: "body", type: "textarea", required: true, label: "İçerik" },
+      ],
+      admin: {
+        description: "Örn. Cihaz hakkında, Kutuda ne var, Nasıl kullanılır",
+      },
+    },
+    {
+      name: "faqs",
+      type: "array",
+      label: "Ürün SSS",
+      labels: { singular: "Soru", plural: "Sorular" },
+      localized: true,
+      fields: [
+        { name: "question", type: "text", required: true, label: "Soru" },
+        { name: "answer", type: "textarea", required: true, label: "Cevap" },
+      ],
+    },
+    {
       name: "features",
       type: "text",
       hasMany: true,
@@ -141,18 +166,35 @@ export const Products: CollectionConfig = {
       label: "Kapak görseli",
     },
     {
+      name: "gallery",
+      type: "array",
+      label: "Galeri",
+      labels: { singular: "Görsel", plural: "Görseller" },
+      fields: [
+        {
+          name: "image",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+        },
+      ],
+      admin: {
+        description: "Kapak dışındaki ek ürün görselleri (Media’ya yüklenmiş).",
+      },
+    },
+    {
       name: "imageUrl",
       type: "text",
       label: "Harici görsel URL",
       admin: {
-        description: "Rozetka vb. uzak görseller için. Upload yoksa kullanılır.",
+        description: "Upload yoksa kullanılır (eski Rozetka URL’leri).",
       },
     },
     {
       name: "images",
       type: "text",
       hasMany: true,
-      label: "Ek görsel URL’leri",
+      label: "Ek görsel URL’leri (harici)",
     },
     {
       name: "sourcePriceUah",

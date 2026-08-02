@@ -83,7 +83,7 @@ export async function POST(request: Request) {
       if (!product.inStock || product.stockQty < quantity) {
         return NextResponse.json(
           {
-            error: `${product.name} için yetersiz stok (kalan: ${product.stockQty}).`,
+            error: `${product.name} şu an satın alınamıyor.`,
           },
           { status: 400 }
         );

@@ -2,7 +2,7 @@
 
 import type { CartItem } from "./types";
 
-const CART_KEY = "soguk-cuzdan-cart";
+const CART_KEY = "kriptostore-cart";
 
 export function getCart(): CartItem[] {
   if (typeof window === "undefined") return [];

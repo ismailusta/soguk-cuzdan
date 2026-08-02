@@ -37,10 +37,10 @@
         const clone = res.clone();
         const ct = clone.headers.get("content-type") || "";
         if (res.ok && ct.includes("json")) {
-          clone.json().then(harvest).catch(() => {});
+          clone.json().then(harvest).catch(() => { });
         }
       }
-    } catch {}
+    } catch { }
     return res;
   };
 
@@ -68,7 +68,7 @@
             harvest(data);
           }
         }
-      } catch {}
+      } catch { }
     });
     return _send.apply(this, args);
   };

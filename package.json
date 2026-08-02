@@ -1,5 +1,5 @@
 {
-  "name": "soguk-cuzdan",
+  "name": "kriptostore",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,6 +17,11 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:seed": "tsx scripts/seed-payload.ts",
+    "db:seed:hero": "tsx scripts/seed-hero.ts",
+    "lwallet:scrape": "node scripts/scrape-lwallet.mjs",
+    "lwallet:import": "tsx scripts/import-lwallet.ts",
+    "lwallet:enrich": "tsx scripts/enrich-lwallet-content.ts",
+    "lwallet:translate": "tsx scripts/translate-lwallet-i18n.ts",
     "db:setup": "npm run db:up && npm run db:seed",
     "test": "tsx --test src/lib/cryptomus.test.ts"
   },

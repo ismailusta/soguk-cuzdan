@@ -1,17 +1,14 @@
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@/components/Analytics";
 import { AuthProvider } from "@/components/AuthProvider";
 import { CartProvider } from "@/components/CartProvider";
 import { Footer } from "@/components/Footer";
 import { FooterMarkets } from "@/components/FooterMarkets";
 import { Header } from "@/components/Header";
+import { JsonLd } from "@/components/JsonLd";
 import { ProductsProvider } from "@/components/ProductsProvider";
-import {
-  BRAND_DESCRIPTION_TR,
-  BRAND_ICON_PATH,
-  BRAND_NAME,
-  siteUrl,
-} from "@/lib/brand";
 import { LocaleProvider } from "@/lib/i18n";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,15 +22,6 @@ const mono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
-const orgJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: BRAND_NAME,
-  url: siteUrl(),
-  description: BRAND_DESCRIPTION_TR,
-  logo: `${siteUrl()}${BRAND_ICON_PATH}`,
-};
-
 export default function StoreLayout({
   children,
 }: Readonly<{
@@ -46,10 +34,9 @@ export default function StoreLayout({
       className={`${inter.variable} ${mono.variable} h-full`}
     >
       <body className="min-h-full antialiased">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-        />
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={websiteJsonLd()} />
+        <Analytics />
         <div className="noir-shell flex min-h-full flex-col">
           <LocaleProvider>
             <AuthProvider>

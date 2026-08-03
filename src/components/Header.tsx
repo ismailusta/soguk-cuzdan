@@ -95,9 +95,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg-nav">
-      <div className="flex h-16 items-center gap-4 px-4 md:gap-8 md:px-8">
+      <div className="flex h-[76px] items-center gap-4 px-4 md:h-[72px] md:gap-8 md:px-8">
         <Link href="/" className="flex shrink-0 items-center">
-          <BrandLogo size={56} priority />
+          <BrandLogo size={58} priority />
         </Link>
 
         <nav className="relative hidden h-full items-center md:flex">

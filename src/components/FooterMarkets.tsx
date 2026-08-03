@@ -23,6 +23,40 @@ function formatTry(n: number) {
   return `₺${n.toLocaleString("tr-TR", { maximumFractionDigits: 6 })}`;
 }
 
+function CoinChip({ c }: { c: MarketCoin }) {
+  const change = c.price_change_percentage_24h ?? 0;
+  const up = change >= 0;
+  return (
+    <li className="flex w-[132px] shrink-0 items-center gap-2.5 rounded-xl border border-line bg-bg-nav/50 px-3 py-2.5">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={c.image}
+        alt=""
+        width={28}
+        height={28}
+        className="h-7 w-7 shrink-0 rounded-full"
+        loading="lazy"
+      />
+      <div className="min-w-0 leading-tight">
+        <p className="truncate text-[12px] font-semibold tracking-wide uppercase">
+          {c.symbol}
+        </p>
+        <p className="truncate text-[11px] tabular-nums text-fg-muted">
+          {formatTry(c.current_price)}
+        </p>
+        <p
+          className={`text-[10px] tabular-nums ${
+            up ? "text-success" : "text-danger"
+          }`}
+        >
+          {up ? "▲" : "▼"}
+          {Math.abs(change).toFixed(1)}%
+        </p>
+      </div>
+    </li>
+  );
+}
+
 export function FooterMarkets() {
   const { locale, t } = useLocale();
   const [coins, setCoins] = useState<MarketCoin[]>([]);
@@ -46,6 +80,8 @@ export function FooterMarkets() {
 
   if (coins.length === 0) return null;
 
+  const track = [...coins, ...coins];
+
   return (
     <section className="mt-auto border-t border-line bg-bg-elevated/60">
       <div className="mx-auto max-w-[1300px] py-8">
@@ -54,49 +90,19 @@ export function FooterMarkets() {
             {t.footerMarkets}
           </p>
           <p className="text-[11px] text-fg-faint">
-            {locale === "en"
-              ? "Swipe → · CoinGecko"
-              : "Kaydır → · CoinGecko"}
+            {locale === "en" ? "Live · CoinGecko" : "Canlı · CoinGecko"}
           </p>
         </div>
-        <ul className="-mx-0 flex gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:thin] snap-x snap-mandatory md:px-12 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-line-strong">
-          {coins.map((c) => {
-            const change = c.price_change_percentage_24h ?? 0;
-            const up = change >= 0;
-            return (
-              <li
-                key={c.id}
-                className="flex w-[132px] shrink-0 snap-start items-center gap-2.5 rounded-xl border border-line bg-bg-nav/50 px-3 py-2.5"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={c.image}
-                  alt=""
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 shrink-0 rounded-full"
-                  loading="lazy"
-                />
-                <div className="min-w-0 leading-tight">
-                  <p className="truncate text-[12px] font-semibold tracking-wide uppercase">
-                    {c.symbol}
-                  </p>
-                  <p className="truncate text-[11px] tabular-nums text-fg-muted">
-                    {formatTry(c.current_price)}
-                  </p>
-                  <p
-                    className={`text-[10px] tabular-nums ${
-                      up ? "text-success" : "text-danger"
-                    }`}
-                  >
-                    {up ? "▲" : "▼"}
-                    {Math.abs(change).toFixed(1)}%
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="markets-marquee-mask overflow-hidden">
+          <ul
+            className="markets-marquee flex w-max gap-3 px-5 md:px-12"
+            aria-label={t.footerMarkets}
+          >
+            {track.map((c, i) => (
+              <CoinChip key={`${c.id}-${i}`} c={c} />
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

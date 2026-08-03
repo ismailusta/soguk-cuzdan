@@ -12,6 +12,20 @@ export function BrandLogo({
   priority?: boolean;
   className?: string;
 }) {
+  const wordScale = size >= 52 ? "lg" : size >= 40 ? "md" : "sm";
+  const topCls =
+    wordScale === "lg"
+      ? "text-[22px] md:text-[24px]"
+      : wordScale === "md"
+        ? "text-[15px] md:text-[16px]"
+        : "text-[13px]";
+  const botCls =
+    wordScale === "lg"
+      ? "text-[16px] md:text-[18px]"
+      : wordScale === "md"
+        ? "text-[12px] md:text-[13px]"
+        : "text-[11px]";
+
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <Image
@@ -24,7 +38,21 @@ export function BrandLogo({
         unoptimized
       />
       {withWordmark && (
-        <span className="text-lg font-bold tracking-[0.5px]">{BRAND_NAME}</span>
+        <span
+          className="flex flex-col justify-center leading-[0.92]"
+          aria-label={BRAND_NAME}
+        >
+          <span
+            className={`${topCls} font-extrabold tracking-[0.06em] text-fg uppercase`}
+          >
+            Kripto
+          </span>
+          <span
+            className={`${botCls} font-light tracking-[0.22em] text-fg/55 uppercase`}
+          >
+            Store
+          </span>
+        </span>
       )}
     </span>
   );

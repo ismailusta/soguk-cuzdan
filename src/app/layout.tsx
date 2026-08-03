@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import {
   BRAND_DESCRIPTION_TR,
-  BRAND_ICON_PATH,
   BRAND_NAME,
   BRAND_TAGLINE_TR,
   siteUrl,
@@ -9,6 +8,7 @@ import {
 import "./globals.css";
 
 const site = siteUrl();
+const gsc = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(site),
@@ -26,15 +26,20 @@ export const metadata: Metadata = {
     "Ledger",
     "Trezor",
     "SafePal",
+    "BitBox",
     "kripto cüzdan Türkiye",
     "cold wallet",
+    "USDT ödeme",
+    "kripto ile ödeme",
   ],
   authors: [{ name: BRAND_NAME, url: site }],
   creator: BRAND_NAME,
   publisher: BRAND_NAME,
+  category: "ecommerce",
   alternates: {
     canonical: site,
   },
+  verification: gsc ? { google: gsc } : undefined,
   icons: {
     icon: [
       { url: "/brand/icon-v2.png", type: "image/png", sizes: "any" },
@@ -51,24 +56,22 @@ export const metadata: Metadata = {
     title: `${BRAND_NAME} — ${BRAND_TAGLINE_TR}`,
     description: BRAND_DESCRIPTION_TR,
     url: site,
-    images: [
-      {
-        url: BRAND_ICON_PATH,
-        width: 512,
-        height: 512,
-        alt: `${BRAND_NAME} logo`,
-      },
-    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: `${BRAND_NAME} — ${BRAND_TAGLINE_TR}`,
     description: BRAND_DESCRIPTION_TR,
-    images: [BRAND_ICON_PATH],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 

@@ -8,7 +8,9 @@ import {
 import "./globals.css";
 
 const site = siteUrl();
-const gsc = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+const gsc =
+  process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim() ||
+  "wgl-Uhd5IIroBpfOt_fMykD7kOnzw8OjmIJyf40mLUI";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site),

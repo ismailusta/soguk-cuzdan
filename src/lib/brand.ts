@@ -1,5 +1,5 @@
-export const BRAND_LOGO_PATH = "/brand/logo.png";
-export const BRAND_ICON_PATH = "/brand/icon.png";
+export const BRAND_LOGO_PATH = "/brand/logo-v2.png";
+export const BRAND_ICON_PATH = "/brand/icon-v2.png";
 
 /** Public company / storefront brand — use everywhere for SEO & copy. */
 export const BRAND_NAME = "Kriptostore";

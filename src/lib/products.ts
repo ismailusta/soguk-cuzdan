@@ -50,7 +50,16 @@ function galleryUrls(doc: PayloadProduct): string[] {
 export function mapProduct(doc: PayloadProduct): Product {
   const name = pickLocale(doc.name as LocalizedString, "tr") || "";
   const nameEn = pickLocale(doc.name as LocalizedString, "en");
-  const cover = mediaUrl(doc.image) || doc.imageUrl || undefined;
+  const uploaded = mediaUrl(doc.image);
+  // Prefer remote CDN URLs when local media files are missing (Hostinger)
+  const cover =
+    (doc.imageUrl && /^https?:\/\//i.test(doc.imageUrl)
+      ? doc.imageUrl
+      : undefined) ||
+    (uploaded && /^https?:\/\//i.test(uploaded) ? uploaded : undefined) ||
+    doc.imageUrl ||
+    uploaded ||
+    undefined;
   const fromGallery = galleryUrls(doc);
   const fromUrls = doc.images ?? [];
   const images = [...fromGallery, ...fromUrls].filter(

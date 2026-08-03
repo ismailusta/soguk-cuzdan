@@ -276,6 +276,30 @@ body {
   color: var(--fg-dim);
 }
 
+.pill {
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
+  background: var(--amber-soft);
+  color: var(--accent);
+}
+
+.pill:hover {
+  border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+  background: color-mix(in oklch, var(--accent) 32%, transparent);
+  color: var(--fg);
+}
+
+.pill-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.pill-active:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }

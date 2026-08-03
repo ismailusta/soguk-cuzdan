@@ -91,35 +91,37 @@ export function ProductFilters({
         )}
       </div>
 
-      <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex flex-col gap-3 pb-8">
         <div
-          className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden"
+          className="-mx-5 overflow-x-auto px-5 pb-2 [scrollbar-width:thin] [scrollbar-color:var(--accent)_transparent] snap-x snap-mandatory md:mx-0 md:px-0 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-accent"
           role="tablist"
           aria-label={t.catalog}
         >
-          <button
-            type="button"
-            onClick={() => setBrand("all")}
-            className={`pill shrink-0 px-4 py-2 font-mono text-xs tracking-[0.14em] uppercase transition-colors ${
-              brand === "all" ? "pill-active" : "text-fg-muted hover:text-fg"
-            }`}
-          >
-            {t.filterAll}
-          </button>
-          {brands.map((b) => (
+          <div className="flex h-[8.75rem] w-max flex-col flex-wrap content-start gap-2">
             <button
-              key={b}
               type="button"
-              onClick={() => setBrand(b)}
-              className={`pill shrink-0 px-4 py-2 font-mono text-xs tracking-[0.14em] uppercase transition-colors ${
-                brand === b ? "pill-active" : "text-fg-muted hover:text-fg"
+              onClick={() => setBrand("all")}
+              className={`pill shrink-0 snap-start px-4 py-2 font-mono text-xs tracking-[0.14em] uppercase transition-colors ${
+                brand === "all" ? "pill-active" : ""
               }`}
             >
-              {b}
+              {t.filterAll}
             </button>
-          ))}
+            {brands.map((b) => (
+              <button
+                key={b}
+                type="button"
+                onClick={() => setBrand(b)}
+                className={`pill shrink-0 snap-start px-4 py-2 font-mono text-xs tracking-[0.14em] uppercase transition-colors ${
+                  brand === b ? "pill-active" : ""
+                }`}
+              >
+                {b}
+              </button>
+            ))}
+          </div>
         </div>
-        <label className="pill flex w-fit shrink-0 cursor-pointer items-center gap-2 px-4 py-2 font-mono text-xs tracking-[0.12em] text-fg-muted uppercase sm:ml-auto">
+        <label className="pill flex w-fit shrink-0 cursor-pointer items-center gap-2 px-4 py-2 font-mono text-xs tracking-[0.12em] uppercase">
           <input
             type="checkbox"
             checked={stockOnly}

@@ -36,8 +36,12 @@ export const metadata: Metadata = {
     canonical: site,
   },
   icons: {
-    icon: [{ url: BRAND_ICON_PATH, type: "image/png" }],
-    apple: [{ url: BRAND_ICON_PATH }],
+    icon: [
+      { url: "/brand/icon-v2.png", type: "image/png", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: ["/brand/icon-v2.png"],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     type: "website",

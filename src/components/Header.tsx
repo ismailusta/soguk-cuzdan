@@ -60,10 +60,9 @@ export function Header() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(
-      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=try&include_24hr_change=true"
-    )
-      .then((r) => r.json())
+    const ac = new AbortController();
+    fetch("/api/markets?kind=btc", { signal: ac.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((data: { bitcoin?: { try?: number; try_24h_change?: number } }) => {
         if (cancelled || !data.bitcoin?.try) return;
         const change = data.bitcoin.try_24h_change ?? 0;
@@ -73,9 +72,12 @@ export function Header() {
           up: change >= 0,
         });
       })
-      .catch(() => {});
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+      });
     return () => {
       cancelled = true;
+      ac.abort();
     };
   }, []);
 
@@ -95,7 +97,7 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-line bg-bg-nav">
       <div className="flex h-16 items-center gap-4 px-4 md:gap-8 md:px-8">
         <Link href="/" className="flex shrink-0 items-center">
-          <BrandLogo size={44} priority />
+          <BrandLogo size={56} priority />
         </Link>
 
         <nav className="relative hidden h-full items-center md:flex">

@@ -109,6 +109,13 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const to = slide.gradientTo || DEFAULT_TO;
   const lines = titleLines(title);
   const alignCenter = slide.titleAlign !== "left";
+  const [bgBroken, setBgBroken] = useState(false);
+
+  useEffect(() => {
+    setBgBroken(false);
+  }, [slide.id, slide.imageUrl]);
+
+  const showBg = Boolean(slide.imageUrl) && !bgBroken;
 
   return (
     <section className="animate-fade w-full">
@@ -119,12 +126,13 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
         }}
       >
         {/* Full-bleed image */}
-        {slide.imageUrl && (
+        {showBg && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={slide.imageUrl}
             alt=""
             className="absolute inset-0 z-0 h-full w-full object-cover"
+            onError={() => setBgBroken(true)}
           />
         )}
 
@@ -132,7 +140,7 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
         <div
           className="absolute inset-0 z-[1]"
           style={{
-            background: slide.imageUrl
+            background: showBg
               ? "linear-gradient(180deg, rgba(8,10,14,0.55) 0%, rgba(8,10,14,0.72) 55%, rgba(8,10,14,0.85) 100%)"
               : "transparent",
           }}

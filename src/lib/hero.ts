@@ -56,6 +56,24 @@ function mediaUrl(
   return (image as MediaLike).url ?? undefined;
 }
 
+function firstHttp(
+  ...urls: Array<string | null | undefined>
+): string | undefined {
+  for (const u of urls) {
+    if (u && /^https?:\/\//i.test(u)) return u;
+  }
+  return undefined;
+}
+
+function firstAny(
+  ...urls: Array<string | null | undefined>
+): string | undefined {
+  for (const u of urls) {
+    if (u) return u;
+  }
+  return undefined;
+}
+
 function resolveProduct(
   rel: PayloadHeroBanner["product"]
 ): Product | null {
@@ -66,12 +84,15 @@ function resolveProduct(
 export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
   const product = resolveProduct(doc.product);
   const uploaded = mediaUrl(doc.image);
+  // Prefer remote CDN / Unsplash over local /api/media (often missing on Hostinger)
   const imageUrl =
-    uploaded ||
-    doc.imageUrl ||
-    product?.image ||
-    product?.images?.[0] ||
-    undefined;
+    firstHttp(
+      doc.imageUrl,
+      product?.image,
+      product?.images?.[0],
+      uploaded
+    ) ||
+    firstAny(doc.imageUrl, uploaded, product?.image, product?.images?.[0]);
 
   return {
     id: String(doc.id),

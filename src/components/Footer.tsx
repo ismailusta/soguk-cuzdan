@@ -8,10 +8,10 @@ export function Footer() {
   const { t } = useLocale();
 
   return (
-    <footer className="mt-auto border-t border-line bg-bg-nav">
+    <footer className="border-t border-line bg-bg-nav">
       <div className="mx-auto flex max-w-[1300px] flex-col gap-8 px-5 py-12 md:flex-row md:justify-between md:px-12">
         <div>
-          <BrandLogo size={52} className="[&_span]:text-xl" />
+          <BrandLogo size={64} className="[&_span]:text-xl" />
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-fg-muted">
             {t.footerBlurb}
           </p>

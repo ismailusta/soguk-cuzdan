@@ -19,8 +19,9 @@ export function BrandLogo({
         alt={BRAND_NAME}
         width={size}
         height={size}
-        className="shrink-0 rounded-md object-contain"
+        className="shrink-0 object-contain"
         priority={priority}
+        unoptimized
       />
       {withWordmark && (
         <span className="text-lg font-bold tracking-[0.5px]">{BRAND_NAME}</span>

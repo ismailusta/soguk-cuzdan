@@ -2,6 +2,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
 import { CartProvider } from "@/components/CartProvider";
 import { Footer } from "@/components/Footer";
+import { FooterMarkets } from "@/components/FooterMarkets";
 import { Header } from "@/components/Header";
 import { ProductsProvider } from "@/components/ProductsProvider";
 import {
@@ -57,6 +58,7 @@ export default function StoreLayout({
                   <div className="relative z-[1] flex min-h-full flex-1 flex-col">
                     <Header />
                     <main className="flex-1">{children}</main>
+                    <FooterMarkets />
                     <Footer />
                   </div>
                 </CartProvider>

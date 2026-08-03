@@ -27,30 +27,30 @@ export function HomeSections({
 
   return (
     <>
-      {/* Category strip — slash nav like lwallet */}
+      {/* Category strip — slash nav, gold theme */}
       <nav
-        className="border-b border-line bg-bg-nav"
+        className="border-b border-accent/25 bg-[color-mix(in_oklch,var(--accent)_14%,var(--bg-nav))]"
         aria-label={t.categories}
       >
         <div className="mx-auto flex max-w-[1300px] items-center gap-4 px-5 py-4 md:px-12">
-          <div className="-mx-1 flex min-w-0 flex-1 items-center overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-1 flex min-w-0 flex-1 items-center overflow-x-auto px-1 [scrollbar-width:thin] [scrollbar-color:var(--accent)_transparent] [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-accent">
             <Link
               href="/urunler"
-              className="shrink-0 px-1.5 text-[13px] font-medium text-fg hover:text-accent md:text-[15px]"
+              className="shrink-0 rounded-full bg-accent px-3 py-1 text-[13px] font-semibold text-accent-ink md:text-[15px]"
             >
               {t.filterAll}
             </Link>
             {brands.map((b) => (
               <span key={b} className="flex shrink-0 items-center">
                 <span
-                  className="mx-2 text-[13px] text-fg-faint select-none md:mx-2.5 md:text-[15px]"
+                  className="mx-2 text-[13px] text-accent/45 select-none md:mx-2.5 md:text-[15px]"
                   aria-hidden
                 >
                   /
                 </span>
                 <Link
                   href={`/urunler?brand=${encodeURIComponent(b)}`}
-                  className="px-1 text-[13px] font-medium text-fg-dim transition-colors hover:text-accent md:text-[15px]"
+                  className="px-1 text-[13px] font-medium text-accent/85 transition-colors hover:text-accent md:text-[15px]"
                 >
                   {b}
                 </Link>
@@ -61,7 +61,7 @@ export function HomeSections({
           <div className="hidden shrink-0 items-center gap-5 sm:flex">
             <Link
               href="/urunler"
-              className="flex items-center gap-1.5 text-[13px] text-fg-dim hover:text-fg"
+              className="flex items-center gap-1.5 text-[13px] font-medium text-accent/80 hover:text-accent"
             >
               <svg
                 width="14"
@@ -78,7 +78,7 @@ export function HomeSections({
             <button
               type="button"
               onClick={() => setSearchOpen((v) => !v)}
-              className="flex items-center gap-1.5 text-[13px] text-fg-dim hover:text-fg"
+              className="flex items-center gap-1.5 text-[13px] font-medium text-accent/80 hover:text-accent"
             >
               <svg
                 width="14"
@@ -99,7 +99,7 @@ export function HomeSections({
         {searchOpen && (
           <form
             onSubmit={onSearch}
-            className="border-t border-line px-5 py-3 md:px-12"
+            className="border-t border-accent/20 px-5 py-3 md:px-12"
           >
             <div className="mx-auto flex max-w-[1300px] gap-2">
               <input

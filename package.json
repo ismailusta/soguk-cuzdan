@@ -22,6 +22,7 @@
     "lwallet:import": "tsx scripts/import-lwallet.ts",
     "lwallet:enrich": "tsx scripts/enrich-lwallet-content.ts",
     "lwallet:translate": "tsx scripts/translate-lwallet-i18n.ts",
+    "db:push": "tsx scripts/push-schema.ts",
     "db:setup": "npm run db:up && npm run db:seed",
     "test": "tsx --test src/lib/cryptomus.test.ts"
   },

@@ -1,12 +1,19 @@
 /**
  * Import lwallet dump into Payload:
- * - download product images into Media
+ * - download product images into Media (default)
+ * - OR --remote-images: store CDN URLs only (good for Hostinger without media disk)
  * - upsert products (cover + gallery)
  *
  * Usage:
  *   npx tsx scripts/import-lwallet.ts
+ *   npx tsx scripts/import-lwallet.ts --remote-images
  *   npx tsx scripts/import-lwallet.ts --limit=10
  *   npx tsx scripts/import-lwallet.ts --skip-existing
+ *
+ * Point at Supabase:
+ *   $env:DATABASE_URL="postgresql://...supabase...?sslmode=no-verify"
+ *   $env:PAYLOAD_SECRET="..."
+ *   $env:NODE_ENV="development"
  */
 import "dotenv/config";
 import { readFileSync, existsSync } from "fs";
@@ -122,6 +129,7 @@ async function main() {
 
   const limit = Number(argFlag("limit") || 0) || 0;
   const skipExisting = argFlag("skip-existing") === "true";
+  const remoteImages = argFlag("remote-images") === "true";
   const maxImages = Number(argFlag("max-images") || 8) || 8;
 
   const dump = JSON.parse(readFileSync(DUMP, "utf-8")) as {
@@ -129,6 +137,10 @@ async function main() {
   };
   let products = dump.products || [];
   if (limit > 0) products = products.slice(0, limit);
+
+  console.log(
+    `Import mode: ${remoteImages ? "remote CDN URLs" : "download → Media"} · ${products.length} products`
+  );
 
   const payload = await getPayload({ config });
   let created = 0;
@@ -157,51 +169,56 @@ async function main() {
     const brand = detectBrand(p.name);
     const priceTry = Math.max(1, Math.round(p.priceUah * UAH_TO_TRY));
     const shortTr =
-      stripHtml(p.shortDescription).slice(0, 400) ||
-      `${brand} — ${p.name}`;
-    const descTr =
-      stripHtml(p.description).slice(0, 4000) || shortTr;
+      stripHtml(p.shortDescription).slice(0, 400) || `${brand} — ${p.name}`;
+    const descTr = stripHtml(p.description).slice(0, 4000) || shortTr;
 
-    // Download images → Media
-    const imageIds: number[] = [];
     const imgs = (p.images || []).slice(0, maxImages);
-    for (const [i, img] of imgs.entries()) {
-      try {
-        await new Promise((r) => setTimeout(r, 250));
-        const file = await downloadBuffer(img.src);
-        const media = await payload.create({
-          collection: "media",
-          data: {
-            alt: img.alt || `${p.name} ${i + 1}`,
-          },
-          file: {
-            data: file.data,
-            mimetype: file.mimetype,
-            name: `${slug}-${i + 1}-${file.name}`.slice(0, 120),
-            size: file.data.byteLength,
-          },
-          overrideAccess: true,
-        });
-        imageIds.push(Number(media.id));
-        console.log(`  media #${media.id} ← ${file.name}`);
-      } catch (err) {
-        console.warn(
-          `  image fail ${img.src}:`,
-          err instanceof Error ? err.message : err
-        );
-      }
-    }
+    const remoteSrcs = imgs.map((i) => i.src).filter(Boolean);
 
-    const coverId = imageIds[0];
-    const gallery = imageIds.slice(1).map((id) => ({ image: id }));
+    let coverId: number | undefined;
+    let gallery: { image: number }[] = [];
+
+    if (!remoteImages) {
+      const imageIds: number[] = [];
+      for (const [i, img] of imgs.entries()) {
+        try {
+          await new Promise((r) => setTimeout(r, 250));
+          const file = await downloadBuffer(img.src);
+          const media = await payload.create({
+            collection: "media",
+            data: {
+              alt: img.alt || `${p.name} ${i + 1}`,
+            },
+            file: {
+              data: file.data,
+              mimetype: file.mimetype,
+              name: `${slug}-${i + 1}-${file.name}`.slice(0, 120),
+              size: file.data.byteLength,
+            },
+            overrideAccess: true,
+          });
+          imageIds.push(Number(media.id));
+          console.log(`  media #${media.id} ← ${file.name}`);
+        } catch (err) {
+          console.warn(
+            `  image fail ${img.src}:`,
+            err instanceof Error ? err.message : err
+          );
+        }
+      }
+      coverId = imageIds[0];
+      gallery = imageIds.slice(1).map((id) => ({ image: id }));
+    } else {
+      console.log(`  remote images=${remoteSrcs.length}`);
+    }
 
     const data = {
       slug,
       brand,
       price: priceTry,
       currency: "TRY",
-      inStock: p.inStock,
-      stockQty: p.inStock ? 10 : 0,
+      inStock: true,
+      stockQty: 10,
       accent: BRAND_ACCENT[brand] || "#9aa4b2",
       name: p.name,
       shortDescription: shortTr,
@@ -211,9 +228,8 @@ async function main() {
       sourceUrl: p.permalink,
       image: coverId,
       gallery,
-      // clear old remote URLs when we have local media
-      imageUrl: coverId ? undefined : undefined,
-      images: [],
+      imageUrl: remoteImages ? remoteSrcs[0] || undefined : undefined,
+      images: remoteImages ? remoteSrcs.slice(1) : [],
     };
 
     if (existingId) {

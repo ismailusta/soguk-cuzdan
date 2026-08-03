@@ -22,6 +22,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "lwallet.com.ua",
+      },
+      {
+        protocol: "https",
+        hostname: "**.lwallet.com.ua",
+      },
+      {
+        protocol: "https",
         hostname: "**.rozetka.com.ua",
       },
       {
@@ -43,6 +51,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "coin-images.coingecko.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },

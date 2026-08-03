@@ -34,7 +34,11 @@ export function ProductVisual({
           }
           className="object-contain p-6 md:p-8"
           priority={large}
-          unoptimized={imageSrc.startsWith("/api/media") || imageSrc.startsWith("http://localhost")}
+          unoptimized={
+            imageSrc.startsWith("/api/media") ||
+            imageSrc.startsWith("http://localhost") ||
+            imageSrc.includes("lwallet.com.ua")
+          }
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-bg/80 to-transparent" />
       </div>

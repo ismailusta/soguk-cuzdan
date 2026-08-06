@@ -140,37 +140,54 @@ export function Header() {
             </svg>
           </button>
 
-          <div className="hidden items-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] font-medium uppercase tracking-wider sm:flex">
+          <div className="flex items-center gap-1 rounded-xl border border-line px-2 py-1.5 text-sm font-semibold tracking-wide">
             <button
               type="button"
               onClick={() => setLocale("tr")}
-              className={locale === "tr" ? "text-accent" : "text-fg-dim"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition ${
+                locale === "tr"
+                  ? "bg-accent/15 text-accent"
+                  : "text-fg-dim hover:text-fg"
+              }`}
+              aria-label="Türkçe"
+              aria-pressed={locale === "tr"}
             >
-              TR
+              <span className="text-base leading-none" aria-hidden>
+                🇹🇷
+              </span>
+              <span>TR</span>
             </button>
-            <span className="text-fg-faint">/</span>
             <button
               type="button"
               onClick={() => setLocale("en")}
-              className={locale === "en" ? "text-accent" : "text-fg-dim"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition ${
+                locale === "en"
+                  ? "bg-accent/15 text-accent"
+                  : "text-fg-dim hover:text-fg"
+              }`}
+              aria-label="English"
+              aria-pressed={locale === "en"}
             >
-              EN
+              <span className="text-base leading-none" aria-hidden>
+                🇬🇧
+              </span>
+              <span>EN</span>
             </button>
           </div>
 
           <Link
             href="/sepet"
-            className="relative flex h-[38px] w-[38px] items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-xs font-semibold"
+            className="relative flex h-[46px] w-[46px] items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-xs font-semibold"
             aria-label={t.cart}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M6 6h15l-1.5 9h-12z" />
               <circle cx="9" cy="20" r="1" />
               <circle cx="18" cy="20" r="1" />
               <path d="M6 6L5 3H2" />
             </svg>
             {ready && count > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold text-accent-ink">
+              <span className="absolute -top-1 -right-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-ink">
                 {count}
               </span>
             )}
@@ -244,16 +261,20 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setLocale("tr")}
-                className={`text-xs font-semibold ${locale === "tr" ? "text-accent" : "text-fg-dim"}`}
+                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
+                  locale === "tr" ? "bg-accent/15 text-accent" : "text-fg-dim"
+                }`}
               >
-                TR
+                <span aria-hidden>🇹🇷</span> TR
               </button>
               <button
                 type="button"
                 onClick={() => setLocale("en")}
-                className={`text-xs font-semibold ${locale === "en" ? "text-accent" : "text-fg-dim"}`}
+                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
+                  locale === "en" ? "bg-accent/15 text-accent" : "text-fg-dim"
+                }`}
               >
-                EN
+                <span aria-hidden>🇬🇧</span> EN
               </button>
             </li>
           </ul>

@@ -10,6 +10,9 @@ import { ProductsProvider } from "@/components/ProductsProvider";
 import { LocaleProvider } from "@/lib/i18n";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { getSiteSettings } from "@/lib/site-settings";
+// Must import here: root layout is pass-through (no <html>), so CSS must
+// attach to this layout that actually renders the document shell.
+import "../globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,8 +38,15 @@ export default async function StoreLayout({
       lang="tr"
       data-scroll-behavior="smooth"
       className={`${inter.variable} ${mono.variable} h-full`}
+      suppressHydrationWarning
     >
       <body className="min-h-full antialiased">
+        {/* Critical fallback if CSS chunk is briefly unavailable after deploy */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `html,body{background:#0a0c10;color:#f4f1ea}body{margin:0}`,
+          }}
+        />
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={websiteJsonLd()} />
         <Analytics />

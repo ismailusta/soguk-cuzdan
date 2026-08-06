@@ -34,6 +34,12 @@ export function Header() {
         match: (p: string) => p.startsWith("/urun"),
       },
       {
+        href: "/iletisim",
+        label: t.navContact,
+        match: (p: string) =>
+          p.startsWith("/iletisim") || p.startsWith("/contact"),
+      },
+      {
         href: "/odeme",
         label: t.navPay,
         match: (p: string) => p.startsWith("/odeme") || p.startsWith("/sepet"),
@@ -102,8 +108,8 @@ export function Header() {
 
         <nav className="relative hidden h-full items-center md:flex">
           <div
-            className="absolute top-2 bottom-2 left-0 z-0 w-[104px] rounded-[9px] bg-bg-pill transition-transform duration-[350ms] ease-[cubic-bezier(.4,0,.2,1)]"
-            style={{ transform: `translateX(${activeIndex * 104}px)` }}
+            className="absolute top-2 bottom-2 left-0 z-0 w-[92px] rounded-[9px] bg-bg-pill transition-transform duration-[350ms] ease-[cubic-bezier(.4,0,.2,1)]"
+            style={{ transform: `translateX(${activeIndex * 92}px)` }}
           />
           {navItems.map((item) => {
             const active = item.match(pathname);
@@ -111,7 +117,7 @@ export function Header() {
               <Link
                 key={item.href + item.label}
                 href={item.href}
-                className={`relative z-[1] flex h-full w-[104px] items-center justify-center text-sm font-medium transition-colors ${
+                className={`relative z-[1] flex h-full w-[92px] items-center justify-center text-sm font-medium transition-colors ${
                   active ? "text-fg" : "text-fg-dim hover:text-fg"
                 }`}
               >

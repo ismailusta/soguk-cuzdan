@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { ProductsProvider } from "@/components/ProductsProvider";
 import { LocaleProvider } from "@/lib/i18n";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/site-settings";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,11 +23,13 @@ const mono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
-export default function StoreLayout({
+export default async function StoreLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const contact = await getSiteSettings();
+
   return (
     <html
       lang="tr"
@@ -46,7 +49,7 @@ export default function StoreLayout({
                     <Header />
                     <main className="flex-1">{children}</main>
                     <FooterMarkets />
-                    <Footer />
+                    <Footer contact={contact} />
                   </div>
                 </CartProvider>
               </ProductsProvider>

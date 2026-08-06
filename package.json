@@ -18,6 +18,7 @@
     "db:down": "docker compose down",
     "db:seed": "tsx scripts/seed-payload.ts",
     "db:seed:hero": "tsx scripts/seed-hero.ts",
+    "db:seed:site": "tsx scripts/seed-site-settings.ts",
     "lwallet:scrape": "node scripts/scrape-lwallet.mjs",
     "lwallet:import": "tsx scripts/import-lwallet.ts",
     "lwallet:enrich": "tsx scripts/enrich-lwallet-content.ts",

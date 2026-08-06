@@ -3,9 +3,12 @@
 import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
 import { useLocale } from "@/lib/i18n";
+import type { SiteContact } from "@/lib/site-contact";
+import { formatAddressOneLine } from "@/lib/site-contact";
 
-export function Footer() {
+export function Footer({ contact }: { contact: SiteContact }) {
   const { t } = useLocale();
+  const wa = contact.whatsapp.replace(/\D/g, "");
 
   return (
     <footer className="border-t border-line bg-bg-nav">
@@ -14,6 +17,11 @@ export function Footer() {
           <BrandLogo size={64} />
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-fg-muted">
             {t.footerBlurb}
+          </p>
+          <p className="mt-3 max-w-sm text-xs leading-relaxed text-fg-faint">
+            {contact.companyLegalName}
+            <br />
+            {formatAddressOneLine(contact)}
           </p>
         </div>
         <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3">
@@ -26,6 +34,9 @@ export function Footer() {
             </Link>
             <Link href="/sepet" className="hover:text-accent">
               {t.cart}
+            </Link>
+            <Link href="/iletisim" className="hover:text-accent">
+              {t.navContact}
             </Link>
             <Link href="/giris" className="hover:text-accent">
               {t.navSignIn}
@@ -47,18 +58,54 @@ export function Footer() {
             <Link href="/kvkk" className="hover:text-accent">
               {t.kvkk}
             </Link>
+            <Link href="/privacy" className="hover:text-accent text-fg-faint">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-accent text-fg-faint">
+              Terms of Service
+            </Link>
+            <Link href="/refund" className="hover:text-accent text-fg-faint">
+              Refund Policy
+            </Link>
           </div>
           <div className="col-span-2 flex flex-col gap-2 text-fg-dim sm:col-span-1">
             <p className="mb-1 text-xs tracking-wider text-fg-faint uppercase">
-              {t.payment}
+              {t.navContact}
             </p>
-            <span>{t.footerPay}</span>
+            <a
+              href={`mailto:${contact.contactEmail}`}
+              className="hover:text-accent"
+            >
+              {contact.contactEmail}
+            </a>
+            {contact.contactPhone ? (
+              <a
+                href={`tel:${contact.contactPhone.replace(/\s/g, "")}`}
+                className="hover:text-accent"
+              >
+                {contact.contactPhone}
+              </a>
+            ) : null}
+            {wa ? (
+              <a
+                href={`https://wa.me/${wa}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent"
+              >
+                WhatsApp
+              </a>
+            ) : null}
+            <Link href="/iletisim" className="hover:text-accent">
+              {t.contactFormLink}
+            </Link>
+            <p className="mt-2 text-fg-faint">{t.footerPay}</p>
           </div>
         </div>
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-[1300px] px-5 py-4 text-xs text-fg-faint md:px-12">
-          © {new Date().getFullYear()} Kriptostore · {t.footerCopy}
+          © {new Date().getFullYear()} {contact.companyLegalName} · {t.footerCopy}
         </p>
       </div>
     </footer>

@@ -8,16 +8,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
     "/urunler",
+    "/iletisim",
+    "/contact",
     "/giris",
     "/gizlilik",
+    "/privacy",
     "/kullanim-kosullari",
+    "/terms",
     "/iade",
+    "/refund",
     "/kvkk",
   ].map((path) => ({
     url: `${site}${path}`,
     lastModified: new Date(),
     changeFrequency: path === "" || path === "/urunler" ? "daily" : "monthly",
-    priority: path === "" ? 1 : 0.7,
+    priority:
+      path === ""
+        ? 1
+        : path === "/urunler" || path === "/iletisim"
+          ? 0.8
+          : 0.6,
   }));
 
   try {

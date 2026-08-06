@@ -22,6 +22,21 @@ export function organizationJsonLd() {
     url: site,
     description: BRAND_DESCRIPTION_TR,
     logo: absoluteUrl(BRAND_ICON_PATH),
+    email: "support@kriptostore.com",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "5830 E 2ND ST, STE 7000 #37465",
+      addressLocality: "Casper",
+      addressRegion: "WY",
+      postalCode: "82609",
+      addressCountry: "US",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: "support@kriptostore.com",
+      availableLanguage: ["Turkish", "English"],
+    },
   };
 }
 

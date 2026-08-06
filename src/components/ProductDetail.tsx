@@ -33,7 +33,7 @@ const DEFAULT_FAQS_TR = [
   {
     question: "Kurulumda yardım alabilir miyim?",
     answer:
-      "Evet. Cihaz kurulumu ve ilk yedekleme için destek kanalımızdan yazabilirsiniz.",
+      "Evet. Cihaz kurulumu ve ilk yedekleme için /iletisim sayfasından yazabilirsiniz.",
   },
 ];
 
@@ -56,7 +56,7 @@ const DEFAULT_FAQS_EN = [
   {
     question: "Can you help with setup?",
     answer:
-      "Yes. Reach out for device setup and first backup guidance.",
+      "Yes. Use the /contact (or /iletisim) page for device setup and first backup help.",
   },
 ];
 

@@ -13,6 +13,7 @@ import { HeroBanners } from "./collections/HeroBanners";
 import { Orders } from "./collections/Orders";
 import { Products } from "./collections/Products";
 import { Users } from "./collections/Users";
+import { SiteSettings } from "./globals/SiteSettings";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -58,6 +59,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Customers, Media, Products, Orders, HeroBanners],
+  globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: payloadSecret,
   typescript: {

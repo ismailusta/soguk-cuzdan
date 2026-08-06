@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { BRAND_NAME } from "@/lib/brand";
 import { useLocale } from "@/lib/i18n";
+import type { SiteContact } from "@/lib/site-contact";
+import { formatAddressOneLine } from "@/lib/site-contact";
 
 type LegalKey = "privacy" | "terms" | "returns" | "kvkk";
 
@@ -12,61 +14,61 @@ const copy: Record<
 > = {
   privacy: {
     tr: {
-      title: "Gizlilik politikası",
+      title: "Gizlilik politikası (Privacy Policy)",
       body: [
-        "Kriptostore olarak sipariş ve hesap verilerinizi yalnızca siparişinizin işlenmesi, kargo ve yasal yükümlülükler için kullanırız.",
+        "Kriptostore olarak sipariş ve hesap verilerinizi yalnızca siparişinizin işlenmesi, kargo, destek ve yasal yükümlülükler için kullanırız.",
         "Ödeme Cryptomus üzerinden gerçekleşir; kart veya cüzdan özel anahtarlarınız bizde tutulmaz.",
-        "Verileriniz Payload CMS / PostgreSQL üzerinde saklanır; üçüncü taraflarla pazarlama amacıyla paylaşılmaz.",
-        "İletişim: site üzerinden hesap e-postanız veya sipariş e-postanız ile bize ulaşabilirsiniz.",
+        "Verileriniz güvenli sunucularda saklanır; üçüncü taraflarla pazarlama amacıyla paylaşılmaz.",
+        "Haklarınız ve talepleriniz için iletişim sayfamızdaki e-posta veya formu kullanabilirsiniz.",
       ],
     },
     en: {
-      title: "Privacy policy",
+      title: "Privacy Policy",
       body: [
-        "Kriptostore uses your order and account data only to process orders, shipping, and legal obligations.",
+        "Kriptostore uses your order and account data only to process orders, shipping, support, and legal obligations.",
         "Payments run via Cryptomus; we never store card details or your crypto private keys.",
-        "Data is stored in Payload CMS / PostgreSQL and is not sold for marketing.",
-        "Contact us using your account or order email.",
+        "Data is stored securely and is not sold for marketing.",
+        "For privacy requests, use the email or contact form on our Contact page.",
       ],
     },
   },
   terms: {
     tr: {
-      title: "Kullanım koşulları",
+      title: "Kullanım / hizmet şartları (Terms of Service)",
       body: [
         "Site üzerinden verilen siparişler Cryptomus faturası oluşturulduğunda rezervasyon sayılır; ödeme onayından sonra kesinleşir.",
         "Ürünler orijinal donanım cüzdanlarıdır; fiyatlar TRY cinsinden listelenir, ödeme kripto ile alınır.",
         "Yanlış tutar veya iptal durumlarında sipariş durumu güncellenir; stok iadesi ödeme durumuna göre yönetilir.",
-        "Siteyi kullanarak bu koşulları kabul etmiş sayılırsınız.",
+        "Siteyi kullanarak bu koşulları kabul etmiş sayılırsınız. Uyuşmazlıklarda öncelikle destek kanalımızla iletişime geçin.",
       ],
     },
     en: {
-      title: "Terms of use",
+      title: "Terms of Service",
       body: [
         "Orders are reserved when a Cryptomus invoice is created and confirmed after payment.",
         "Products are genuine hardware wallets; prices are listed in TRY and paid in crypto.",
         "Wrong-amount or cancelled payments update order status; stock is managed accordingly.",
-        "By using the site you accept these terms.",
+        "By using the site you accept these terms. Contact support first for any dispute.",
       ],
     },
   },
   returns: {
     tr: {
-      title: "İade ve iptal",
+      title: "İade politikası (Refund Policy)",
       body: [
-        "Ödeme tamamlanmadan iptal edilen Cryptomus faturalarında sipariş iptal durumuna geçer.",
+        "Ödeme tamamlanmadan iptal edilen Cryptomus faturalarında sipariş iptal durumuna geçer; ödeme alınmamışsa ücret iadesi gerekmez.",
         "Açılmamış, mühürlü donanım ürünlerinde yasal cayma hakkı kapsamında iade talepleri değerlendirilir.",
         "Açılmış veya aktive edilmiş cihazlarda güvenlik nedeniyle iade kısıtlı olabilir.",
-        "İade talepleriniz için sipariş e-postanız ve sipariş numaranız ile iletişime geçin.",
+        "İade talepleri için sipariş numaranız ve e-postanız ile iletişim formunu veya destek e-postasını kullanın. Onaylanan iadeler Cryptomus / ödeme kanalı üzerinden işlenir.",
       ],
     },
     en: {
-      title: "Returns & cancellation",
+      title: "Refund Policy",
       body: [
-        "Unpaid Cryptomus invoices move the order to cancelled.",
+        "Unpaid Cryptomus invoices move the order to cancelled; no refund is due if no payment was received.",
         "Unopened sealed hardware may be returnable under applicable cooling-off rules.",
         "Opened or activated devices may have limited return options for security reasons.",
-        "Contact us with your order email and order ID for return requests.",
+        "Request returns via the contact form or support email with your order ID. Approved refunds are processed via Cryptomus / the payment channel.",
       ],
     },
   },
@@ -75,8 +77,8 @@ const copy: Record<
       title: "KVKK bilgilendirme",
       body: [
         "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında; ad, e-posta, telefon ve teslimat adresi sipariş süreçleri için işlenir.",
-        "Veri sorumlusu: Kriptostore. Amaç: sözleşme ifası ve yasal zorunluluklar.",
-        "Haklarınız: erişim, düzeltme, silme ve itiraz. Taleplerinizi kayıtlı e-posta adresiniz üzerinden iletebilirsiniz.",
+        "Amaç: sözleşme ifası, müşteri desteği ve yasal zorunluluklar.",
+        "Haklarınız: erişim, düzeltme, silme ve itiraz. Taleplerinizi destek e-postası veya iletişim formu ile iletebilirsiniz.",
         "Saklama süresi: sipariş ve muhasebe yükümlülükleri süresince; ardından silinir veya anonimleştirilir.",
       ],
     },
@@ -84,15 +86,21 @@ const copy: Record<
       title: "Privacy notice (KVKK)",
       body: [
         "Under Turkish KVKK, name, email, phone and shipping address are processed for order fulfillment.",
-        "Controller: Kriptostore. Purpose: contract performance and legal duties.",
-        "Your rights include access, correction, deletion and objection via your registered email.",
+        "Purpose: contract performance, customer support and legal duties.",
+        "Your rights include access, correction, deletion and objection via support email or the contact form.",
         "Retention follows order/accounting obligations, then deletion or anonymization.",
       ],
     },
   },
 };
 
-export function LegalPage({ kind }: { kind: LegalKey }) {
+export function LegalPage({
+  kind,
+  contact,
+}: {
+  kind: LegalKey;
+  contact: SiteContact;
+}) {
   const { locale, t } = useLocale();
   const content = copy[kind][locale];
 
@@ -108,9 +116,53 @@ export function LegalPage({ kind }: { kind: LegalKey }) {
         {content.body.map((p) => (
           <p key={p.slice(0, 40)}>{p}</p>
         ))}
+        {contact.productOrigin ? (
+          <p>
+            <strong className="text-fg">
+              {locale === "en" ? "Product origin: " : "Ürün kaynağı: "}
+            </strong>
+            {contact.productOrigin}
+          </p>
+        ) : null}
       </div>
+
+      <div className="mt-10 rounded-xl border border-line bg-bg-elevated/40 p-5 text-sm leading-relaxed text-fg-muted">
+        <p className="text-xs tracking-wider text-fg-faint uppercase">
+          {locale === "en" ? "Merchant / contact" : "Satıcı / iletişim"}
+        </p>
+        <p className="mt-2 font-medium text-fg">{contact.companyLegalName}</p>
+        <p className="mt-1">{formatAddressOneLine(contact)}</p>
+        <p className="mt-2">
+          <a
+            href={`mailto:${contact.contactEmail}`}
+            className="text-accent hover:underline"
+          >
+            {contact.contactEmail}
+          </a>
+          {contact.contactPhone ? (
+            <>
+              {" · "}
+              <a
+                href={`tel:${contact.contactPhone.replace(/\s/g, "")}`}
+                className="text-accent hover:underline"
+              >
+                {contact.contactPhone}
+              </a>
+            </>
+          ) : null}
+        </p>
+        <p className="mt-3">
+          <Link href="/iletisim" className="text-accent hover:underline">
+            {locale === "en" ? "Contact form →" : "İletişim formu →"}
+          </Link>
+        </p>
+      </div>
+
       <p className="mt-10">
-        <Link href="/" className="inline-flex items-center text-sm text-accent hover:underline">
+        <Link
+          href="/"
+          className="inline-flex items-center text-sm text-accent hover:underline"
+        >
           ← {BRAND_NAME}
         </Link>
       </p>

@@ -47,6 +47,20 @@ async function main() {
     console.log(`✓ ${collection} (total=${r.totalDocs})`);
   }
 
+  try {
+    await payload.findGlobal({
+      slug: "site-settings",
+      depth: 0,
+      overrideAccess: true,
+    } as never);
+    console.log("✓ site-settings global");
+  } catch (e) {
+    console.warn(
+      "site-settings global missing or empty — run: npm run db:seed:site",
+      e instanceof Error ? e.message : e
+    );
+  }
+
   console.log("\nDone. Tables exist on Supabase. Open /admin and create first user.");
   process.exit(0);
 }

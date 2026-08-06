@@ -4,10 +4,10 @@ import Link from "next/link";
 import { BrandLogo } from "./BrandLogo";
 import { useLocale } from "@/lib/i18n";
 import type { SiteContact } from "@/lib/site-contact";
-import { formatAddressOneLine } from "@/lib/site-contact";
+import { formatAddressOneLine, pickLocale } from "@/lib/site-contact";
 
 export function Footer({ contact }: { contact: SiteContact }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const wa = contact.whatsapp.replace(/\D/g, "");
 
   return (
@@ -99,13 +99,17 @@ export function Footer({ contact }: { contact: SiteContact }) {
             <Link href="/iletisim" className="hover:text-accent">
               {t.contactFormLink}
             </Link>
+            <p className="mt-1 text-xs text-fg-faint">
+              {pickLocale(contact.supportHours, locale)}
+            </p>
             <p className="mt-2 text-fg-faint">{t.footerPay}</p>
           </div>
         </div>
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-[1300px] px-5 py-4 text-xs text-fg-faint md:px-12">
-          © {new Date().getFullYear()} {contact.companyLegalName} · {t.footerCopy}
+          © {new Date().getFullYear()} {contact.companyLegalName} ·{" "}
+          {t.footerCopy}
         </p>
       </div>
     </footer>

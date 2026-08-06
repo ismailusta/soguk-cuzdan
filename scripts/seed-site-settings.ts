@@ -1,33 +1,66 @@
 /**
- * Upserts Site Settings global with LLC defaults.
+ * Upserts Site Settings global (contact + legal pages) for both locales.
  * Usage: npx tsx scripts/seed-site-settings.ts
+ *
+ * Also creates the global row if Hostinger admin shows "Not Found"
+ * (run after db:push against Supabase).
  */
 import "dotenv/config";
 import { getPayload } from "payload";
 import config from "../src/payload.config";
 import { DEFAULT_SITE_CONTACT } from "../src/lib/site-contact";
 
-async function main() {
-  const payload = await getPayload({ config });
-  await payload.updateGlobal({
+const d = DEFAULT_SITE_CONTACT;
+
+async function upsertLocale(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  locale: "tr" | "en"
+) {
+  const L = locale;
+  await (
+    payload.updateGlobal as (args: {
+      slug: string;
+      locale?: string;
+      data: Record<string, unknown>;
+      overrideAccess?: boolean;
+    }) => Promise<unknown>
+  )({
     slug: "site-settings",
-    data: {
-      companyLegalName: DEFAULT_SITE_CONTACT.companyLegalName,
-      contactEmail: DEFAULT_SITE_CONTACT.contactEmail,
-      contactPhone: DEFAULT_SITE_CONTACT.contactPhone || undefined,
-      whatsapp: DEFAULT_SITE_CONTACT.whatsapp || undefined,
-      supportHours: DEFAULT_SITE_CONTACT.supportHours,
-      addressLine1: DEFAULT_SITE_CONTACT.addressLine1,
-      addressLine2: DEFAULT_SITE_CONTACT.addressLine2 || undefined,
-      city: DEFAULT_SITE_CONTACT.city,
-      state: DEFAULT_SITE_CONTACT.state,
-      postalCode: DEFAULT_SITE_CONTACT.postalCode,
-      country: DEFAULT_SITE_CONTACT.country,
-      productOrigin: DEFAULT_SITE_CONTACT.productOrigin,
-    },
+    locale,
     overrideAccess: true,
+    data: {
+      companyLegalName: d.companyLegalName,
+      contactEmail: d.contactEmail,
+      contactPhone: d.contactPhone || undefined,
+      whatsapp: d.whatsapp || undefined,
+      addressLine1: d.addressLine1,
+      addressLine2: d.addressLine2 || undefined,
+      city: d.city,
+      state: d.state,
+      postalCode: d.postalCode,
+      country: d.country,
+      supportHours: d.supportHours[L],
+      contactPageTitle: d.contactPageTitle[L],
+      contactPageIntro: d.contactPageIntro[L],
+      productOrigin: d.productOrigin[L],
+      privacyTitle: d.privacy.title[L],
+      privacyBody: d.privacy.body[L],
+      termsTitle: d.terms.title[L],
+      termsBody: d.terms.body[L],
+      returnsTitle: d.returns.title[L],
+      returnsBody: d.returns.body[L],
+      kvkkTitle: d.kvkk.title[L],
+      kvkkBody: d.kvkk.body[L],
+    },
   });
-  console.log("Site settings seeded:", DEFAULT_SITE_CONTACT.companyLegalName);
+}
+
+async function main() {
+  process.env.PAYLOAD_DATABASE_PUSH ??= "true";
+  const payload = await getPayload({ config });
+  await upsertLocale(payload, "tr");
+  await upsertLocale(payload, "en");
+  console.log("Site settings seeded (TR+EN):", d.companyLegalName);
   process.exit(0);
 }
 

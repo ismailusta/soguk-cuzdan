@@ -1,4 +1,5 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { en } from "@payloadcms/translations/languages/en";
 import { tr } from "@payloadcms/translations/languages/tr";
@@ -48,6 +49,29 @@ function resolveDatabaseUrl(): string {
 const databaseUrl = resolveDatabaseUrl();
 const isSupabase = /supabase\.com/i.test(databaseUrl);
 
+const smtpUser = process.env.SMTP_USER?.trim() || "support@kriptostore.com";
+const smtpPass = process.env.SMTP_PASS?.trim();
+const smtpHost = process.env.SMTP_HOST?.trim() || "smtp.hostinger.com";
+const smtpPort = Number(process.env.SMTP_PORT || "465");
+const smtpFrom = process.env.SMTP_FROM?.trim() || smtpUser;
+
+const email = smtpPass
+  ? await nodemailerAdapter({
+      defaultFromAddress: smtpFrom,
+      defaultFromName: "Kriptostore",
+      skipVerify: process.env.SMTP_SKIP_VERIFY === "true",
+      transportOptions: {
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      },
+    })
+  : undefined;
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -62,6 +86,7 @@ export default buildConfig({
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: payloadSecret,
+  ...(email ? { email } : {}),
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },

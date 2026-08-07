@@ -14,6 +14,9 @@ import { getSiteSettings } from "@/lib/site-settings";
 // attach to this layout that actually renders the document shell.
 import "../globals.css";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],

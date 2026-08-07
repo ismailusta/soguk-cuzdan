@@ -100,10 +100,15 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg-nav">
-      <div className="flex h-[76px] items-center gap-4 px-4 md:h-[72px] md:gap-8 md:px-8">
-        <Link href="/" className="flex shrink-0 items-center">
-          <BrandLogo size={58} priority />
+    <header className="sticky top-0 z-40 overflow-x-clip border-b border-line bg-bg-nav">
+      <div className="flex h-[64px] max-w-full items-center gap-2 px-3 sm:gap-3 sm:px-4 md:h-[72px] md:gap-8 md:px-8">
+        <Link href="/" className="min-w-0 shrink items-center">
+          <span className="md:hidden">
+            <BrandLogo size={40} priority />
+          </span>
+          <span className="hidden md:inline-flex">
+            <BrandLogo size={58} priority />
+          </span>
         </Link>
 
         <nav className="relative hidden h-full items-center md:flex">
@@ -127,11 +132,11 @@ export function Header() {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 md:gap-3">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
           <button
             type="button"
             onClick={() => setSearchOpen((v) => !v)}
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-fg-dim hover:text-fg"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-fg-dim hover:text-fg sm:h-[38px] sm:w-[38px]"
             aria-label={t.search}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -140,11 +145,11 @@ export function Header() {
             </svg>
           </button>
 
-          <div className="flex items-center gap-1 rounded-xl border border-line px-2 py-1.5 text-sm font-semibold tracking-wide">
+          <div className="flex items-center rounded-xl border border-line p-0.5 text-xs font-semibold tracking-wide sm:gap-0.5 sm:p-1 sm:text-sm">
             <button
               type="button"
               onClick={() => setLocale("tr")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition ${
+              className={`inline-flex items-center gap-1 rounded-lg px-1.5 py-1 transition sm:gap-1.5 sm:px-2 ${
                 locale === "tr"
                   ? "bg-accent/15 text-accent"
                   : "text-fg-dim hover:text-fg"
@@ -152,15 +157,15 @@ export function Header() {
               aria-label="Türkçe"
               aria-pressed={locale === "tr"}
             >
-              <span className="text-base leading-none" aria-hidden>
+              <span className="text-[15px] leading-none sm:text-base" aria-hidden>
                 🇹🇷
               </span>
-              <span>TR</span>
+              <span className="hidden sm:inline">TR</span>
             </button>
             <button
               type="button"
               onClick={() => setLocale("en")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 transition ${
+              className={`inline-flex items-center gap-1 rounded-lg px-1.5 py-1 transition sm:gap-1.5 sm:px-2 ${
                 locale === "en"
                   ? "bg-accent/15 text-accent"
                   : "text-fg-dim hover:text-fg"
@@ -168,19 +173,19 @@ export function Header() {
               aria-label="English"
               aria-pressed={locale === "en"}
             >
-              <span className="text-base leading-none" aria-hidden>
+              <span className="text-[15px] leading-none sm:text-base" aria-hidden>
                 🇬🇧
               </span>
-              <span>EN</span>
+              <span className="hidden sm:inline">EN</span>
             </button>
           </div>
 
           <Link
             href="/sepet"
-            className="relative flex h-[46px] w-[46px] items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-xs font-semibold"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.28_0.006_260_/_0.5)] bg-[oklch(0.18_0.005_260)] text-xs font-semibold sm:h-[42px] sm:w-[42px] md:h-[46px] md:w-[46px]"
             aria-label={t.cart}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="h-[18px] w-[18px] sm:h-[20px] sm:w-[20px] md:h-[22px] md:w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M6 6h15l-1.5 9h-12z" />
               <circle cx="9" cy="20" r="1" />
               <circle cx="18" cy="20" r="1" />
@@ -204,7 +209,7 @@ export function Header() {
 
           <button
             type="button"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-full border border-line md:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line sm:h-[38px] sm:w-[38px] md:hidden"
             aria-label={menuOpen ? t.closeMenu : t.openMenu}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}

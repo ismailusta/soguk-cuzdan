@@ -46,27 +46,37 @@ export function Footer({ contact }: { contact: SiteContact }) {
             <p className="mb-1 text-xs tracking-wider text-fg-faint uppercase">
               {t.legal}
             </p>
-            <Link href="/gizlilik" className="hover:text-accent">
-              {t.privacy}
-            </Link>
-            <Link href="/kullanim-kosullari" className="hover:text-accent">
-              {t.terms}
-            </Link>
-            <Link href="/iade" className="hover:text-accent">
-              {t.returns}
-            </Link>
-            <Link href="/kvkk" className="hover:text-accent">
-              {t.kvkk}
-            </Link>
-            <Link href="/privacy" className="hover:text-accent text-fg-faint">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-accent text-fg-faint">
-              Terms of Service
-            </Link>
-            <Link href="/refund" className="hover:text-accent text-fg-faint">
-              Refund Policy
-            </Link>
+            {locale === "en" ? (
+              <>
+                <Link href="/privacy" className="hover:text-accent">
+                  {t.privacy}
+                </Link>
+                <Link href="/terms" className="hover:text-accent">
+                  {t.terms}
+                </Link>
+                <Link href="/refund" className="hover:text-accent">
+                  {t.returns}
+                </Link>
+                <Link href="/kvkk" className="hover:text-accent">
+                  {t.kvkk}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/gizlilik" className="hover:text-accent">
+                  {t.privacy}
+                </Link>
+                <Link href="/kullanim-kosullari" className="hover:text-accent">
+                  {t.terms}
+                </Link>
+                <Link href="/iade" className="hover:text-accent">
+                  {t.returns}
+                </Link>
+                <Link href="/kvkk" className="hover:text-accent">
+                  {t.kvkk}
+                </Link>
+              </>
+            )}
           </div>
           <div className="col-span-2 flex flex-col gap-2 text-fg-dim sm:col-span-1">
             <p className="mb-1 text-xs tracking-wider text-fg-faint uppercase">

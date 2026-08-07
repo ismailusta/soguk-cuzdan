@@ -60,7 +60,7 @@ export default async function StoreLayout({
                 <CartProvider>
                   <div className="relative z-[1] flex min-h-full flex-1 flex-col">
                     <Header />
-                    <main className="flex-1">{children}</main>
+                    <main className="flex-1 pt-[64px] md:pt-[72px]">{children}</main>
                     <FooterMarkets />
                     <Footer contact={contact} />
                   </div>

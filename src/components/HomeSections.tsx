@@ -27,9 +27,9 @@ export function HomeSections({
 
   return (
     <>
-      {/* Category strip — slash nav, gold theme */}
+      {/* Category strip — directly under hero, never overlaid on it */}
       <nav
-        className="border-b border-accent/25 bg-[color-mix(in_oklch,var(--accent)_14%,var(--bg-nav))]"
+        className="relative z-10 border-b border-accent/25 bg-[color-mix(in_oklch,var(--accent)_14%,var(--bg-nav))]"
         aria-label={t.categories}
       >
         <div className="mx-auto flex max-w-[1300px] items-center gap-4 px-5 py-4 md:px-12">

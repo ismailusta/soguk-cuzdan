@@ -19,11 +19,16 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
+  const [scrolled, setScrolled] = useState(false);
   const [ticker, setTicker] = useState<Ticker>({
     price: "₺—",
     change: "—",
     up: true,
   });
+
+  const isHome = pathname === "/";
+  const transparentNav =
+    isHome && !scrolled && !menuOpen && !searchOpen;
 
   const navItems = useMemo(() => {
     const items = [
@@ -65,6 +70,13 @@ export function Header() {
   }, [pathname]);
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     const ac = new AbortController();
     fetch("/api/markets?kind=btc", { signal: ac.signal })
@@ -100,7 +112,13 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 overflow-x-clip border-b border-line bg-bg-nav">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 overflow-x-clip transition-[background-color,border-color,backdrop-filter] duration-300 ${
+        transparentNav
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-line bg-bg-nav/90 backdrop-blur-md"
+      }`}
+    >
       <div className="flex h-[64px] max-w-full items-center gap-2 px-3 sm:gap-3 sm:px-4 md:h-[72px] md:gap-8 md:px-8">
         <Link href="/" className="min-w-0 shrink items-center">
           <span className="md:hidden">

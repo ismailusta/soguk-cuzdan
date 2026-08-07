@@ -126,9 +126,9 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const showBg = Boolean(slide.imageUrl) && !bgBroken;
 
   return (
-    <section className="animate-fade w-full">
+    <section className="animate-fade relative z-0 w-full">
       <div
-        className="relative w-full overflow-hidden border-b border-line"
+        className="relative w-full overflow-hidden"
         style={{
           background: `linear-gradient(135deg, ${from}, ${to})`,
         }}

@@ -11,7 +11,7 @@ export type BadgeTone = "accent" | "success" | "danger" | "muted";
 
 export type HeroSlide = {
   id: string;
-  title: string;
+  title?: string;
   titleEn?: string;
   subtitle?: string;
   subtitleEn?: string;
@@ -96,7 +96,7 @@ export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
 
   return {
     id: String(doc.id),
-    title: pickLocale(doc.title as LocalizedString, "tr") || "",
+    title: pickLocale(doc.title as LocalizedString, "tr") || undefined,
     titleEn: pickLocale(doc.title as LocalizedString, "en"),
     subtitle: pickLocale(doc.subtitle as LocalizedString, "tr"),
     subtitleEn: pickLocale(doc.subtitle as LocalizedString, "en"),
@@ -111,15 +111,15 @@ export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
     secondaryHref: doc.secondaryHref || undefined,
     imageUrl,
     product,
-    showPrice: doc.showPrice !== false,
-    layout: (doc.layout as HeroLayout) || "textLeft",
+    showPrice: Boolean(doc.showPrice),
+    layout: (doc.layout as HeroLayout) || "textOverlay",
     titleSize: (doc.titleSize as TitleSize) || "xl",
     subtitleSize: (doc.subtitleSize as SubtitleSize) || "md",
-    titleAlign: (doc.titleAlign as TitleAlign) || "left",
+    titleAlign: (doc.titleAlign as TitleAlign) || "center",
     titleUppercase: doc.titleUppercase !== false,
     gradientFrom: doc.gradientFrom || undefined,
     gradientTo: doc.gradientTo || undefined,
-    accentGlow: doc.accentGlow !== false,
+    accentGlow: Boolean(doc.accentGlow),
   };
 }
 

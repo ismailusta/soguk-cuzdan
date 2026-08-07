@@ -70,7 +70,7 @@ function FallbackSlide({ locale }: { locale: "tr" | "en" }): HeroSlide {
 
 /** All slides = full-bleed lifestyle banner (lwallet-style overlay). */
 export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
-  const { locale, t } = useLocale();
+  const { locale } = useLocale();
   const slides =
     banners.length > 0 ? banners : [FallbackSlide({ locale })];
   const [index, setIndex] = useState(0);
@@ -91,8 +91,7 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const title = pick(locale, slide.title, slide.titleEn);
   const subtitle = pick(locale, slide.subtitle, slide.subtitleEn);
   const badge = pick(locale, slide.badge, slide.badgeEn);
-  const ctaLabel =
-    pick(locale, slide.ctaLabel, slide.ctaLabelEn) || t.buyNow;
+  const ctaLabel = pick(locale, slide.ctaLabel, slide.ctaLabelEn);
   const secondaryLabel = pick(
     locale,
     slide.secondaryLabel,
@@ -109,6 +108,15 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const to = slide.gradientTo || DEFAULT_TO;
   const lines = titleLines(title);
   const alignCenter = slide.titleAlign !== "left";
+  const showPrice = Boolean(slide.showPrice && slide.product);
+  const hasOverlayText = Boolean(
+    lines.length ||
+      subtitle ||
+      badge ||
+      ctaLabel ||
+      secondaryLabel ||
+      showPrice
+  );
   const [bgBroken, setBgBroken] = useState(false);
 
   useEffect(() => {
@@ -130,23 +138,24 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={slide.imageUrl}
-            alt=""
+            alt={title || "Banner"}
             className="absolute inset-0 z-0 h-full w-full object-cover"
             onError={() => setBgBroken(true)}
           />
         )}
 
-        {/* Dark scrim for readable text */}
+        {/* Dark scrim only when text sits on the image */}
         <div
           className="absolute inset-0 z-[1]"
           style={{
-            background: showBg
-              ? "linear-gradient(180deg, rgba(8,10,14,0.55) 0%, rgba(8,10,14,0.72) 55%, rgba(8,10,14,0.85) 100%)"
-              : "transparent",
+            background:
+              showBg && hasOverlayText
+                ? "linear-gradient(180deg, rgba(8,10,14,0.35) 0%, rgba(8,10,14,0.55) 55%, rgba(8,10,14,0.72) 100%)"
+                : "transparent",
           }}
         />
 
-        {slide.accentGlow && (
+        {slide.accentGlow && hasOverlayText && (
           <div
             className="pointer-events-none absolute inset-0 z-[1] opacity-40"
             style={{
@@ -156,67 +165,73 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
           />
         )}
 
-        <div className="relative z-[2] mx-auto flex min-h-[420px] max-w-[900px] flex-col items-center justify-center px-5 py-16 text-center md:min-h-[520px] md:py-20">
-          {badge && (
+        <div
+          className={`relative z-[2] mx-auto flex min-h-[420px] max-w-[900px] flex-col justify-center px-5 py-16 md:min-h-[520px] md:py-20 ${
+            alignCenter ? "items-center text-center" : "items-start text-left"
+          } ${hasOverlayText ? "" : "pointer-events-none"}`}
+        >
+          {badge ? (
             <span
               className={`mb-5 inline-flex rounded-full px-3.5 py-1 text-[11px] font-semibold tracking-[1.4px] uppercase ${BADGE_TONE[slide.badgeTone]}`}
             >
               {badge}
             </span>
-          )}
+          ) : null}
 
-          <h1
-            className={`leading-[1.02] font-bold tracking-[-2px] text-fg ${TITLE_SIZE[slide.titleSize]} ${
-              slide.titleUppercase ? "uppercase" : ""
-            } ${alignCenter ? "" : "self-start text-left"}`}
-          >
-            {lines.map((line, i) => (
-              <span key={`${slide.id}-${i}`} className="block">
-                {line}
-              </span>
-            ))}
-          </h1>
-
-          {subtitle && (
-            <p
-              className={`mt-5 max-w-lg whitespace-pre-line leading-relaxed text-fg-muted ${SUB_SIZE[slide.subtitleSize]} ${
-                alignCenter ? "" : "self-start text-left"
+          {lines.length > 0 ? (
+            <h1
+              className={`leading-[1.02] font-bold tracking-[-2px] text-fg ${TITLE_SIZE[slide.titleSize]} ${
+                slide.titleUppercase ? "uppercase" : ""
               }`}
+            >
+              {lines.map((line, i) => (
+                <span key={`${slide.id}-${i}`} className="block">
+                  {line}
+                </span>
+              ))}
+            </h1>
+          ) : null}
+
+          {subtitle ? (
+            <p
+              className={`mt-5 max-w-lg whitespace-pre-line leading-relaxed text-fg-muted ${SUB_SIZE[slide.subtitleSize]}`}
             >
               {subtitle}
             </p>
-          )}
+          ) : null}
 
-          {slide.showPrice && slide.product && (
+          {showPrice && slide.product ? (
             <p className="mt-5 text-2xl font-semibold tabular-nums text-accent">
               {formatPrice(slide.product.price, slide.product.currency)}
             </p>
-          )}
+          ) : null}
 
-          <div
-            className={`mt-8 flex flex-wrap items-center gap-4 ${
-              alignCenter ? "justify-center" : "self-start"
-            }`}
-          >
-            <Link
-              href={ctaHref}
-              className="btn-primary rounded-full px-8 py-3.5 text-sm font-bold tracking-wide uppercase"
-            >
-              {ctaLabel}
-            </Link>
-            {secondaryLabel && (
-              <Link
-                href={secondaryHref}
-                className="text-sm font-medium text-fg-dim underline-offset-4 hover:text-fg hover:underline"
-              >
-                {secondaryLabel}
-              </Link>
-            )}
-          </div>
+          {(ctaLabel || secondaryLabel) && (
+            <div className="mt-8 flex flex-wrap items-center gap-4 pointer-events-auto">
+              {ctaLabel ? (
+                <Link
+                  href={ctaHref}
+                  className="btn-primary rounded-full px-8 py-3.5 text-sm font-bold tracking-wide uppercase"
+                >
+                  {ctaLabel}
+                </Link>
+              ) : null}
+              {secondaryLabel ? (
+                <Link
+                  href={secondaryHref}
+                  className="text-sm font-medium text-fg-dim underline-offset-4 hover:text-fg hover:underline"
+                >
+                  {secondaryLabel}
+                </Link>
+              ) : null}
+            </div>
+          )}
 
           {slides.length > 1 && (
             <div
-              className="mt-12 flex gap-2"
+              className={`mt-12 flex gap-2 pointer-events-auto ${
+                hasOverlayText ? "" : "absolute bottom-8 left-1/2 -translate-x-1/2"
+              }`}
               role="tablist"
               aria-label="Hero"
             >

@@ -11,7 +11,7 @@ export const HeroBanners: CollectionConfig = {
     defaultColumns: ["title", "active", "order", "layout", "updatedAt"],
     group: "Mağaza",
     description:
-      "Anasayfa hero slide’ları. Başlıkta Enter ile satır kır. Sıra: küçük sayı önce.",
+      "Anasayfa hero slide’ları. Sadece görsel de ekleyebilirsin — başlık/CTA zorunlu değil. Sıra: küçük sayı önce.",
   },
   access: {
     read: () => true,
@@ -38,17 +38,56 @@ export const HeroBanners: CollectionConfig = {
       type: "tabs",
       tabs: [
         {
-          label: "İçerik",
+          label: "Görsel",
+          fields: [
+            {
+              name: "image",
+              type: "upload",
+              relationTo: "media",
+              label: "Banner görseli",
+              admin: {
+                description:
+                  "Tek başına yeterli. Metin eklemezsen full-bleed görsel gösterilir.",
+              },
+            },
+            {
+              name: "imageUrl",
+              type: "text",
+              label: "Harici görsel URL",
+              admin: {
+                description: "Upload yoksa kullanılır (CDN / Unsplash).",
+              },
+            },
+            {
+              name: "product",
+              type: "relationship",
+              relationTo: "products",
+              label: "Ürün (opsiyonel)",
+              admin: {
+                description:
+                  "Görsel / fiyat / CTA link için yedek. Serbest alanlar önceliklidir.",
+              },
+            },
+            {
+              name: "showPrice",
+              type: "checkbox",
+              defaultValue: false,
+              label: "Fiyatı göster (ürün seçiliyse)",
+            },
+          ],
+        },
+        {
+          label: "İçerik (opsiyonel)",
           fields: [
             {
               name: "title",
               type: "textarea",
-              required: true,
+              required: false,
               localized: true,
               label: "Başlık",
               admin: {
                 description:
-                  "Her satır Enter ile kırılır. Örn:\nLEDGER\nSTAX",
+                  "Boş bırakılabilir (sadece görsel banner). Enter ile satır kırılır.",
               },
             },
             {
@@ -84,7 +123,10 @@ export const HeroBanners: CollectionConfig = {
                   type: "text",
                   localized: true,
                   label: "CTA metni",
-                  admin: { width: "50%" },
+                  admin: {
+                    width: "50%",
+                    description: "Boşsa buton gösterilmez.",
+                  },
                 },
                 {
                   name: "ctaHref",
@@ -119,41 +161,6 @@ export const HeroBanners: CollectionConfig = {
           ],
         },
         {
-          label: "Görsel",
-          fields: [
-            {
-              name: "image",
-              type: "upload",
-              relationTo: "media",
-              label: "Banner görseli",
-            },
-            {
-              name: "imageUrl",
-              type: "text",
-              label: "Harici görsel URL",
-              admin: {
-                description: "Upload yoksa kullanılır.",
-              },
-            },
-            {
-              name: "product",
-              type: "relationship",
-              relationTo: "products",
-              label: "Ürün (opsiyonel)",
-              admin: {
-                description:
-                  "Görsel / fiyat / CTA link için yedek. Serbest alanlar önceliklidir.",
-              },
-            },
-            {
-              name: "showPrice",
-              type: "checkbox",
-              defaultValue: true,
-              label: "Fiyatı göster (ürün seçiliyse)",
-            },
-          ],
-        },
-        {
           label: "Düzen & stil",
           fields: [
             {
@@ -172,7 +179,7 @@ export const HeroBanners: CollectionConfig = {
               label: "Düzen",
               admin: {
                 description:
-                  "Tüm slide’lar full-bleed arka plan + üstünde metin. Bu alan sadece hizayı etkiler.",
+                  "Tüm slide’lar full-bleed arka plan. Metin yoksa sadece görsel.",
               },
             },
             {
@@ -206,7 +213,7 @@ export const HeroBanners: CollectionConfig = {
                 {
                   name: "titleAlign",
                   type: "select",
-                  defaultValue: "left",
+                  defaultValue: "center",
                   options: [
                     { label: "Sol", value: "left" },
                     { label: "Orta", value: "center" },
@@ -249,7 +256,7 @@ export const HeroBanners: CollectionConfig = {
             {
               name: "accentGlow",
               type: "checkbox",
-              defaultValue: true,
+              defaultValue: false,
               label: "Accent ışıltı",
             },
           ],

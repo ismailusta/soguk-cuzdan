@@ -225,24 +225,31 @@ export function ProductDetail({
       {showAbout && (
         <section className="overflow-x-hidden border-t border-line bg-bg-nav/40">
           <div className="mx-auto w-full max-w-[900px] px-5 py-14 md:px-12 md:py-16">
-            <h2 className="mb-8 text-2xl font-bold tracking-tight">
-              {locale === "en" ? "About this device" : "Cihaz hakkında"}
-            </h2>
-
             {sections.length > 0 ? (
               <div className="space-y-10">
-                {sections.map((s) => (
-                  <div key={s.title} className="min-w-0 max-w-full">
-                    <h3 className="mb-3 [overflow-wrap:anywhere] break-words text-lg font-semibold">
+                {sections.map((s, i) => (
+                  <div key={`${s.title}-${i}`} className="min-w-0 max-w-full">
+                    <h2
+                      className={`[overflow-wrap:anywhere] break-words font-bold tracking-tight ${
+                        i === 0
+                          ? "mb-4 text-2xl"
+                          : "mb-3 text-lg font-semibold"
+                      }`}
+                    >
                       {s.title}
-                    </h3>
+                    </h2>
                     <RichText data={s.body} />
                   </div>
                 ))}
               </div>
-            ) : (
-              <RichText data={desc} />
-            )}
+            ) : hasRichText(desc) ? (
+              <>
+                <h2 className="mb-8 text-2xl font-bold tracking-tight">
+                  {locale === "en" ? "About this device" : "Cihaz hakkında"}
+                </h2>
+                <RichText data={desc} />
+              </>
+            ) : null}
           </div>
         </section>
       )}

@@ -68,16 +68,32 @@ export const Products: CollectionConfig = {
       labels: { singular: "Bölüm", plural: "Bölümler" },
       localized: true,
       fields: [
-        { name: "title", type: "text", required: true, label: "Başlık" },
+        {
+          name: "title",
+          type: "text",
+          required: true,
+          label: "Başlık",
+          defaultValue: "Cihaz hakkında",
+          admin: {
+            description:
+              "Sitede bölüm başlığı olur. Varsayılan: Cihaz hakkında",
+          },
+        },
         {
           name: "body",
           type: "richText",
           required: true,
-          label: "İçerik",
+          label: "Detay",
+          admin: {
+            description:
+              "Kalın yazı, liste, link. Sitede başlığın altında çıkar.",
+          },
         },
       ],
       admin: {
-        description: "Örn. Cihaz hakkında, Kutuda ne var, Nasıl kullanılır",
+        initCollapsed: false,
+        description:
+          "Her bölüm: Başlık + Detay. TR/EN için üstteki dil seçicisini kullan.",
       },
     },
     {

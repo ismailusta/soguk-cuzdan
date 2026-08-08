@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { RichText } from "@/components/RichText";
 import { BRAND_NAME } from "@/lib/brand";
 import { useLocale } from "@/lib/i18n";
 import type { SiteContact } from "@/lib/site-contact";
 import {
-  bodyParagraphs,
   formatAddressOneLine,
   pickLocale,
+  pickRichLocale,
 } from "@/lib/site-contact";
 
 type LegalKey = "privacy" | "terms" | "returns" | "kvkk";
@@ -22,7 +23,7 @@ export function LegalPage({
   const { locale, t } = useLocale();
   const page = contact[kind];
   const title = pickLocale(page.title, locale);
-  const paragraphs = bodyParagraphs(pickLocale(page.body, locale));
+  const body = pickRichLocale(page.body, locale);
   const origin = pickLocale(contact.productOrigin, locale);
 
   return (
@@ -34,9 +35,7 @@ export function LegalPage({
         {title}
       </h1>
       <div className="mt-8 space-y-5 text-[15px] leading-relaxed text-fg-muted">
-        {paragraphs.map((p) => (
-          <p key={p.slice(0, 48)}>{p}</p>
-        ))}
+        <RichText data={body} />
         {origin ? (
           <p>
             <strong className="text-fg">

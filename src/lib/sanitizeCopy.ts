@@ -1,3 +1,9 @@
+import {
+  hasRichText,
+  normalizeLexical,
+  type RichTextValue,
+} from "@/lib/lexical";
+
 /**
  * Strip leftover WPBakery / Elementor tab shortcode crumbs that leak into
  * product copy (title="", tab_id="", dangling ]).
@@ -45,22 +51,30 @@ export function stripShortcodeArtifacts(input: string): string {
   return s;
 }
 
+export function normalizeRichBody(value: unknown): RichTextValue | null {
+  if (typeof value === "string") {
+    const cleaned = stripShortcodeArtifacts(value);
+    return normalizeLexical(cleaned);
+  }
+  return normalizeLexical(value);
+}
+
 export function cleanSection(s: {
   title: string;
-  body: string;
-}): { title: string; body: string } {
-  return {
-    title: stripShortcodeArtifacts(s.title),
-    body: stripShortcodeArtifacts(s.body),
-  };
+  body: unknown;
+}): { title: string; body: RichTextValue } | null {
+  const title = stripShortcodeArtifacts(s.title);
+  const body = normalizeRichBody(s.body);
+  if (!title || !body || !hasRichText(body)) return null;
+  return { title, body };
 }
 
 export function cleanFaq(f: {
   question: string;
-  answer: string;
-}): { question: string; answer: string } {
-  return {
-    question: stripShortcodeArtifacts(f.question),
-    answer: stripShortcodeArtifacts(f.answer),
-  };
+  answer: unknown;
+}): { question: string; answer: RichTextValue } | null {
+  const question = stripShortcodeArtifacts(f.question);
+  const answer = normalizeRichBody(f.answer);
+  if (!question || !answer || !hasRichText(answer)) return null;
+  return { question, answer };
 }

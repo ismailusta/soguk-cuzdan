@@ -3,6 +3,7 @@ import { getPayload } from "payload";
 import config from "../src/payload.config";
 import { readFileSync } from "fs";
 import path from "path";
+import { textToLexical } from "../src/lib/lexical";
 
 type SeedProduct = {
   id: string;
@@ -66,7 +67,7 @@ async function main() {
           ...shared,
           name: p.name,
           shortDescription: p.shortDescription,
-          description: p.description,
+          description: textToLexical(p.description),
           features: p.features || [],
         },
         overrideAccess: true,
@@ -79,7 +80,7 @@ async function main() {
           ...shared,
           name: p.name,
           shortDescription: p.shortDescription,
-          description: p.description,
+          description: textToLexical(p.description),
           features: p.features || [],
         },
         overrideAccess: true,
@@ -91,7 +92,7 @@ async function main() {
         data: {
           name: p.nameEn || p.name,
           shortDescription: p.shortDescriptionEn || p.shortDescription,
-          description: p.descriptionEn || p.description,
+          description: textToLexical(p.descriptionEn || p.description),
           features: p.featuresEn || p.features || [],
         },
         overrideAccess: true,
@@ -108,7 +109,7 @@ async function main() {
       data: {
         name: p.nameEn || p.name,
         shortDescription: p.shortDescriptionEn || p.shortDescription,
-        description: p.descriptionEn || p.description,
+        description: textToLexical(p.descriptionEn || p.description),
         features: p.featuresEn || p.features || [],
       },
       overrideAccess: true,

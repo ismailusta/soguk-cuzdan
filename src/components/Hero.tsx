@@ -68,6 +68,38 @@ function FallbackSlide({ locale }: { locale: "tr" | "en" }): HeroSlide {
   };
 }
 
+function HeroBackground({
+  desktop,
+  mobile,
+  alt,
+  onError,
+}: {
+  desktop: string;
+  mobile?: string;
+  alt: string;
+  onError: () => void;
+}) {
+  const imgClass = "absolute inset-0 z-0 h-full w-full object-cover";
+  if (mobile && mobile !== desktop) {
+    return (
+      <picture>
+        <source media="(max-width: 767px)" srcSet={mobile} />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={desktop}
+          alt={alt}
+          className={imgClass}
+          onError={onError}
+        />
+      </picture>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={desktop} alt={alt} className={imgClass} onError={onError} />
+  );
+}
+
 /** All slides = full-bleed lifestyle banner (lwallet-style overlay). */
 export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const { locale } = useLocale();
@@ -98,6 +130,10 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
     slide.secondaryLabelEn
   );
 
+  const desktopUrl = pick(locale, slide.imageUrl, slide.imageUrlEn);
+  const mobileUrl =
+    pick(locale, slide.imageUrlMobile, slide.imageUrlMobileEn) || undefined;
+
   const productHref = slide.product
     ? `/urun/${slide.product.slug}`
     : undefined;
@@ -121,9 +157,9 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
 
   useEffect(() => {
     setBgBroken(false);
-  }, [slide.id, slide.imageUrl]);
+  }, [slide.id, desktopUrl, mobileUrl]);
 
-  const showBg = Boolean(slide.imageUrl) && !bgBroken;
+  const showBg = Boolean(desktopUrl) && !bgBroken;
 
   return (
     <section className="relative z-0 w-full">
@@ -133,16 +169,14 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
           background: `linear-gradient(135deg, ${from}, ${to})`,
         }}
       >
-        {/* Full-bleed image */}
-        {showBg && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={slide.imageUrl}
+        {showBg && desktopUrl ? (
+          <HeroBackground
+            desktop={desktopUrl}
+            mobile={mobileUrl}
             alt={title || "Banner"}
-            className="absolute inset-0 z-0 h-full w-full object-cover"
             onError={() => setBgBroken(true)}
           />
-        )}
+        ) : null}
 
         {/* Dark scrim only when text sits on the image */}
         <div

@@ -8,11 +8,13 @@ import {
   productShort,
   useLocale,
 } from "@/lib/i18n";
+import { hasRichText, lexicalPlaintext } from "@/lib/lexical";
 import { formatPrice } from "@/lib/money";
 import type { Product } from "@/lib/types";
 import { AddToCartButton } from "./AddToCartButton";
 import { ProductCard } from "./ProductCard";
 import { ProductVisual } from "./ProductVisual";
+import { RichText } from "./RichText";
 
 const DEFAULT_FAQS_TR = [
   {
@@ -86,7 +88,7 @@ function Accordion({
         </span>
       </button>
       {open && (
-        <div className="animate-fade max-w-full [overflow-wrap:anywhere] break-words pb-4 text-sm leading-relaxed text-fg-muted whitespace-pre-wrap">
+        <div className="animate-fade max-w-full [overflow-wrap:anywhere] break-words pb-4 text-sm leading-relaxed text-fg-muted">
           {children}
         </div>
       )}
@@ -113,7 +115,9 @@ export function ProductDetail({
   const [active, setActive] = useState(0);
   const activeSrc = thumbs[active] || product.image;
 
-  const teaser = productShort(product, locale) || productDesc(product, locale);
+  const teaser =
+    productShort(product, locale) ||
+    lexicalPlaintext(productDesc(product, locale));
 
   const sections =
     locale === "en" && product.detailSectionsEn?.length
@@ -130,6 +134,9 @@ export function ProductDetail({
         : locale === "en"
           ? DEFAULT_FAQS_EN
           : DEFAULT_FAQS_TR;
+
+  const desc = productDesc(product, locale);
+  const showAbout = sections.length > 0 || hasRichText(desc);
 
   return (
     <div className="animate-fade overflow-x-hidden">
@@ -215,7 +222,7 @@ export function ProductDetail({
         </div>
       </div>
 
-      {(sections.length > 0 || product.description) && (
+      {showAbout && (
         <section className="overflow-x-hidden border-t border-line bg-bg-nav/40">
           <div className="mx-auto w-full max-w-[900px] px-5 py-14 md:px-12 md:py-16">
             <h2 className="mb-8 text-2xl font-bold tracking-tight">
@@ -229,16 +236,12 @@ export function ProductDetail({
                     <h3 className="mb-3 [overflow-wrap:anywhere] break-words text-lg font-semibold">
                       {s.title}
                     </h3>
-                    <p className="max-w-full [overflow-wrap:anywhere] break-words text-[15px] leading-relaxed text-fg-muted whitespace-pre-wrap">
-                      {s.body}
-                    </p>
+                    <RichText data={s.body} />
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="max-w-full [overflow-wrap:anywhere] break-words text-[15px] leading-relaxed text-fg-muted whitespace-pre-wrap">
-                {productDesc(product, locale)}
-              </p>
+              <RichText data={desc} />
             )}
           </div>
         </section>
@@ -250,7 +253,7 @@ export function ProductDetail({
           <div className="min-w-0 max-w-full">
             {faqs.map((f) => (
               <Accordion key={f.question} title={f.question}>
-                {f.answer}
+                <RichText data={f.answer} />
               </Accordion>
             ))}
           </div>

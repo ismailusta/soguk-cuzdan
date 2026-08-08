@@ -20,6 +20,7 @@ import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { getPayload } from "payload";
 import config from "../src/payload.config";
+import { textToLexical } from "../src/lib/lexical";
 
 const UAH_TO_TRY = Number(process.env.LWALLET_UAH_TRY || 1.15);
 const DUMP = path.join(process.cwd(), "data", "lwallet-dump.json");
@@ -222,7 +223,7 @@ async function main() {
       accent: BRAND_ACCENT[brand] || "#9aa4b2",
       name: p.name,
       shortDescription: shortTr,
-      description: descTr,
+      description: textToLexical(descTr),
       features: [],
       sourcePriceUah: p.priceUah,
       sourceUrl: p.permalink,

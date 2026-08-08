@@ -10,6 +10,7 @@ import path from "path";
 import { pathToFileURL } from "url";
 import { getPayload } from "payload";
 import config from "../src/payload.config";
+import { textToLexical } from "../src/lib/lexical";
 
 const DUMP = path.join(process.cwd(), "data", "lwallet-dump.json");
 
@@ -77,17 +78,17 @@ async function main() {
       locale: "tr",
       data: {
         shortDescription,
-        description,
+        description: textToLexical(description),
         features,
         detailSections: sections.map(
           (s: { title: string; body: string }) => ({
             title: s.title,
-            body: s.body,
+            body: textToLexical(s.body),
           })
         ),
         faqs: faqs.map((f: { question: string; answer: string }) => ({
           question: f.question,
-          answer: f.answer,
+          answer: textToLexical(f.answer),
         })),
       },
       overrideAccess: true,

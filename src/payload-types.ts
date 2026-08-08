@@ -237,21 +237,66 @@ export interface Product {
   slug: string;
   brand: string;
   shortDescription: string;
-  description: string;
+  /**
+   * Kalın yazı, liste ve link destekler (Lexical).
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   /**
    * Örn. Cihaz hakkında, Kutuda ne var, Nasıl kullanılır
    */
   detailSections?:
     | {
         title: string;
-        body: string;
+        body: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         id?: string | null;
       }[]
     | null;
   faqs?:
     | {
         question: string;
-        answer: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
         id?: string | null;
       }[]
     | null;
@@ -341,13 +386,21 @@ export interface HeroBanner {
    */
   order?: number | null;
   /**
-   * Tek başına yeterli. Metin eklemezsen full-bleed görsel gösterilir.
+   * Önerilen: 1920×1080 (veya 1920×900). TR/EN için üstteki dil seçicisini kullanın — metin görselin içindeyse her dil ayrı yüklenir.
    */
   image?: (number | null) | Media;
+  /**
+   * Önerilen: 768×1200 / 750×1334. Boşsa desktop kullanılır. Dil seçicisi ile TR/EN ayrı.
+   */
+  imageMobile?: (number | null) | Media;
   /**
    * Upload yoksa kullanılır (CDN / Unsplash).
    */
   imageUrl?: string | null;
+  /**
+   * Mobil upload yoksa. Boşsa desktop URL / görsel.
+   */
+  imageUrlMobile?: string | null;
   /**
    * Görsel / fiyat / CTA link için yedek. Serbest alanlar önceliklidir.
    */
@@ -646,7 +699,9 @@ export interface HeroBannersSelect<T extends boolean = true> {
   active?: T;
   order?: T;
   image?: T;
+  imageMobile?: T;
   imageUrl?: T;
+  imageUrlMobile?: T;
   product?: T;
   showPrice?: T;
   title?: T;
@@ -734,24 +789,80 @@ export interface SiteSetting {
   country: string;
   privacyTitle?: string | null;
   /**
-   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   * Kalın yazı, liste ve link destekler. TR/EN için üstteki dil seçicisini kullanın.
    */
-  privacyBody?: string | null;
+  privacyBody?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   termsTitle?: string | null;
   /**
-   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   * Kalın yazı, liste ve link destekler. TR/EN için üstteki dil seçicisini kullanın.
    */
-  termsBody?: string | null;
+  termsBody?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   returnsTitle?: string | null;
   /**
-   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   * Kalın yazı, liste ve link destekler. TR/EN için üstteki dil seçicisini kullanın.
    */
-  returnsBody?: string | null;
+  returnsBody?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   kvkkTitle?: string | null;
   /**
-   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   * Kalın yazı, liste ve link destekler. TR/EN için üstteki dil seçicisini kullanın.
    */
-  kvkkBody?: string | null;
+  kvkkBody?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Yasal sayfalarda ve moderasyon metninde gösterilir.
    */

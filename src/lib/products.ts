@@ -3,9 +3,11 @@ import { getPayloadClient } from "@/lib/payload";
 import {
   cleanFaq,
   cleanSection,
+  normalizeRichBody,
   stripShortcodeArtifacts,
 } from "@/lib/sanitizeCopy";
 import type { Product } from "@/lib/types";
+import type { RichTextValue } from "@/lib/lexical";
 
 type MediaLike = {
   url?: string | null;
@@ -16,6 +18,12 @@ type LocalizedStrings =
   | string[]
   | { tr?: string[] | null; en?: string[] | null }
   | null;
+type LocalizedRich =
+  | RichTextValue
+  | string
+  | { tr?: unknown; en?: unknown }
+  | null
+  | undefined;
 
 function pickLocale(
   value: LocalizedString,
@@ -24,6 +32,22 @@ function pickLocale(
   if (value == null) return undefined;
   if (typeof value === "string") return value;
   return value[locale] ?? value.tr ?? value.en ?? undefined;
+}
+
+function pickLocaleRich(
+  value: LocalizedRich,
+  locale: "tr" | "en"
+): RichTextValue | null {
+  if (value == null) return null;
+  if (typeof value === "string" || (typeof value === "object" && "root" in value)) {
+    return normalizeRichBody(value);
+  }
+  const o = value as { tr?: unknown; en?: unknown };
+  return (
+    normalizeRichBody(o[locale]) ||
+    normalizeRichBody(o.tr) ||
+    normalizeRichBody(o.en)
+  );
 }
 
 function pickLocaleList(
@@ -52,6 +76,32 @@ function galleryUrls(doc: PayloadProduct): string[] {
     .filter((u): u is string => Boolean(u));
 }
 
+function mapSections(
+  rows: { title?: string | null; body?: unknown }[] | null | undefined
+) {
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .map((s) =>
+      s?.title ? cleanSection({ title: String(s.title), body: s.body }) : null
+    )
+    .filter((s): s is { title: string; body: RichTextValue } => Boolean(s));
+}
+
+function mapFaqs(
+  rows: { question?: string | null; answer?: unknown }[] | null | undefined
+) {
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .map((f) =>
+      f?.question
+        ? cleanFaq({ question: String(f.question), answer: f.answer })
+        : null
+    )
+    .filter(
+      (f): f is { question: string; answer: RichTextValue } => Boolean(f)
+    );
+}
+
 export function mapProduct(doc: PayloadProduct): Product {
   const name = pickLocale(doc.name as LocalizedString, "tr") || "";
   const nameEn = pickLocale(doc.name as LocalizedString, "en");
@@ -71,6 +121,40 @@ export function mapProduct(doc: PayloadProduct): Product {
     (u, i, arr) => u && u !== cover && arr.indexOf(u) === i
   ) as string[];
 
+  const detailRaw = (doc as { detailSections?: unknown }).detailSections;
+  const faqsRaw = (doc as { faqs?: unknown }).faqs;
+
+  let detailSections = mapSections(
+    Array.isArray(detailRaw)
+      ? detailRaw
+      : (detailRaw as { tr?: { title?: string; body?: unknown }[] })?.tr
+  );
+  let detailSectionsEn: Product["detailSectionsEn"];
+  if (detailRaw && !Array.isArray(detailRaw) && typeof detailRaw === "object") {
+    const en = (detailRaw as { en?: { title?: string; body?: unknown }[] }).en;
+    if (Array.isArray(en)) detailSectionsEn = mapSections(en);
+  }
+
+  let faqs = mapFaqs(
+    Array.isArray(faqsRaw)
+      ? faqsRaw
+      : (faqsRaw as { tr?: { question?: string; answer?: unknown }[] })?.tr
+  );
+  let faqsEn: Product["faqsEn"];
+  if (faqsRaw && !Array.isArray(faqsRaw) && typeof faqsRaw === "object") {
+    const en = (faqsRaw as { en?: { question?: string; answer?: unknown }[] })
+      .en;
+    if (Array.isArray(en)) faqsEn = mapFaqs(en);
+  }
+
+  // When locale=all returns arrays directly for default locale only
+  if (Array.isArray(detailRaw) && !detailSectionsEn) {
+    detailSections = mapSections(detailRaw);
+  }
+  if (Array.isArray(faqsRaw) && !faqsEn) {
+    faqs = mapFaqs(faqsRaw);
+  }
+
   return {
     id: String(doc.id),
     slug: doc.slug,
@@ -84,13 +168,8 @@ export function mapProduct(doc: PayloadProduct): Product {
       const v = pickLocale(doc.shortDescription as LocalizedString, "en");
       return v ? stripShortcodeArtifacts(v) : undefined;
     })(),
-    description: stripShortcodeArtifacts(
-      pickLocale(doc.description as LocalizedString, "tr") || ""
-    ),
-    descriptionEn: (() => {
-      const v = pickLocale(doc.description as LocalizedString, "en");
-      return v ? stripShortcodeArtifacts(v) : undefined;
-    })(),
+    description: pickLocaleRich(doc.description as LocalizedRich, "tr"),
+    descriptionEn: pickLocaleRich(doc.description as LocalizedRich, "en"),
     price: doc.price,
     currency: doc.currency,
     features: pickLocaleList(doc.features as LocalizedStrings, "tr").map(
@@ -104,60 +183,10 @@ export function mapProduct(doc: PayloadProduct): Product {
     accent: doc.accent || "#9aa4b2",
     image: cover,
     images,
-    detailSections: Array.isArray(doc.detailSections)
-      ? doc.detailSections
-          .filter((s) => s?.title && s?.body)
-          .map((s) =>
-            cleanSection({ title: String(s.title), body: String(s.body) })
-          )
-          .filter((s) => s.title && s.body)
-      : [],
-    detailSectionsEn: (() => {
-      const raw = (doc as { detailSections?: unknown }).detailSections;
-      // when locale=all, localized arrays may be { tr, en }
-      if (raw && !Array.isArray(raw) && typeof raw === "object") {
-        const en = (raw as { en?: { title?: string; body?: string }[] }).en;
-        if (Array.isArray(en)) {
-          return en
-            .filter((s) => s?.title && s?.body)
-            .map((s) =>
-              cleanSection({ title: String(s.title), body: String(s.body) })
-            )
-            .filter((s) => s.title && s.body);
-        }
-      }
-      return undefined;
-    })(),
-    faqs: Array.isArray(doc.faqs)
-      ? doc.faqs
-          .filter((f) => f?.question && f?.answer)
-          .map((f) =>
-            cleanFaq({
-              question: String(f.question),
-              answer: String(f.answer),
-            })
-          )
-          .filter((f) => f.question && f.answer)
-      : [],
-    faqsEn: (() => {
-      const raw = (doc as { faqs?: unknown }).faqs;
-      if (raw && !Array.isArray(raw) && typeof raw === "object") {
-        const en = (raw as { en?: { question?: string; answer?: string }[] })
-          .en;
-        if (Array.isArray(en)) {
-          return en
-            .filter((f) => f?.question && f?.answer)
-            .map((f) =>
-              cleanFaq({
-                question: String(f.question),
-                answer: String(f.answer),
-              })
-            )
-            .filter((f) => f.question && f.answer);
-        }
-      }
-      return undefined;
-    })(),
+    detailSections,
+    detailSectionsEn,
+    faqs,
+    faqsEn,
     sourcePriceUah: doc.sourcePriceUah ?? null,
     sourceUrl: doc.sourceUrl ?? null,
     featuredOnHome: Boolean(doc.featuredOnHome),
@@ -222,51 +251,20 @@ export async function getProductBySlug(
 
   const product = mapProduct({
     ...tr,
-    // keep localized name/desc shape for pickLocale in mapProduct
     name: { tr: tr.name as string, en: (en?.name as string) || undefined },
     shortDescription: {
       tr: tr.shortDescription as string,
       en: (en?.shortDescription as string) || undefined,
     },
     description: {
-      tr: tr.description as string,
-      en: (en?.description as string) || undefined,
+      tr: tr.description,
+      en: en?.description,
     },
     features: {
       tr: (tr.features as string[]) || [],
       en: (en?.features as string[]) || [],
     },
   } as never);
-
-  const mapSections = (
-    rows: { title?: string | null; body?: string | null }[] | null | undefined
-  ) =>
-    Array.isArray(rows)
-      ? rows
-          .filter((s) => s?.title && s?.body)
-          .map((s) =>
-            cleanSection({ title: String(s.title), body: String(s.body) })
-          )
-          .filter((s) => s.title && s.body)
-      : [];
-
-  const mapFaqs = (
-    rows:
-      | { question?: string | null; answer?: string | null }[]
-      | null
-      | undefined
-  ) =>
-    Array.isArray(rows)
-      ? rows
-          .filter((f) => f?.question && f?.answer)
-          .map((f) =>
-            cleanFaq({
-              question: String(f.question),
-              answer: String(f.answer),
-            })
-          )
-          .filter((f) => f.question && f.answer)
-      : [];
 
   product.detailSections = mapSections(tr.detailSections);
   product.detailSectionsEn = mapSections(en?.detailSections);

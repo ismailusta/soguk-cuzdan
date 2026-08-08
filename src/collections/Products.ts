@@ -53,10 +53,13 @@ export const Products: CollectionConfig = {
     },
     {
       name: "description",
-      type: "textarea",
+      type: "richText",
       required: true,
       localized: true,
       label: "Açıklama",
+      admin: {
+        description: "Kalın yazı, liste ve link destekler (Lexical).",
+      },
     },
     {
       name: "detailSections",
@@ -66,7 +69,12 @@ export const Products: CollectionConfig = {
       localized: true,
       fields: [
         { name: "title", type: "text", required: true, label: "Başlık" },
-        { name: "body", type: "textarea", required: true, label: "İçerik" },
+        {
+          name: "body",
+          type: "richText",
+          required: true,
+          label: "İçerik",
+        },
       ],
       admin: {
         description: "Örn. Cihaz hakkında, Kutuda ne var, Nasıl kullanılır",
@@ -80,7 +88,12 @@ export const Products: CollectionConfig = {
       localized: true,
       fields: [
         { name: "question", type: "text", required: true, label: "Soru" },
-        { name: "answer", type: "textarea", required: true, label: "Cevap" },
+        {
+          name: "answer",
+          type: "richText",
+          required: true,
+          label: "Cevap",
+        },
       ],
     },
     {

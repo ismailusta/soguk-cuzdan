@@ -12,6 +12,7 @@ import fs from "fs";
 import path from "path";
 import { getPayload } from "payload";
 import config from "../src/payload.config";
+import { lexicalPlaintext, textToLexical } from "../src/lib/lexical";
 import { stripShortcodeArtifacts } from "../src/lib/sanitizeCopy";
 
 function needsClean(s: string): boolean {
@@ -56,7 +57,7 @@ async function main() {
           overrideAccess: true,
         });
 
-        const desc = String(one.description || "");
+        const desc = lexicalPlaintext(one.description) || "";
         const sections = Array.isArray(one.detailSections)
           ? one.detailSections
           : [];
@@ -66,12 +67,12 @@ async function main() {
         const dirtySections = sections.some(
           (s) =>
             needsClean(String(s?.title || "")) ||
-            needsClean(String(s?.body || ""))
+            needsClean(lexicalPlaintext(s?.body) || "")
         );
         const dirtyFaqs = faqs.some(
           (f) =>
             needsClean(String(f?.question || "")) ||
-            needsClean(String(f?.answer || ""))
+            needsClean(lexicalPlaintext(f?.answer) || "")
         );
 
         if (!dirtyDesc && !dirtySections && !dirtyFaqs) continue;
@@ -82,24 +83,36 @@ async function main() {
         const data: Record<string, unknown> = {};
         if (dirtyDesc) {
           const cleaned = stripShortcodeArtifacts(desc);
-          data.description =
-            cleaned || `${String(one.name || slug)} — ürün açıklaması.`;
+          data.description = textToLexical(
+            cleaned || `${String(one.name || slug)} — ürün açıklaması.`
+          );
         }
         if (dirtySections) {
           data.detailSections = sections
             .map((s) => ({
               title: stripShortcodeArtifacts(String(s?.title || "")),
-              body: stripShortcodeArtifacts(String(s?.body || "")),
+              body: textToLexical(
+                stripShortcodeArtifacts(lexicalPlaintext(s?.body) || "")
+              ),
             }))
-            .filter((s) => s.title.trim() && s.body.trim().length >= 5);
+            .filter(
+              (s) =>
+                s.title.trim() && lexicalPlaintext(s.body).trim().length >= 5
+            );
         }
         if (dirtyFaqs) {
           data.faqs = faqs
             .map((f) => ({
               question: stripShortcodeArtifacts(String(f?.question || "")),
-              answer: stripShortcodeArtifacts(String(f?.answer || "")),
+              answer: textToLexical(
+                stripShortcodeArtifacts(lexicalPlaintext(f?.answer) || "")
+              ),
             }))
-            .filter((f) => f.question.trim() && f.answer.trim().length >= 5);
+            .filter(
+              (f) =>
+                f.question.trim() &&
+                lexicalPlaintext(f.answer).trim().length >= 5
+            );
         }
 
         try {

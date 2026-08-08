@@ -1,7 +1,12 @@
 import type { GlobalConfig } from "payload";
+import { textToLexical } from "@/lib/lexical";
 
-const paraHint =
-  "Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.";
+const richHint =
+  "Kalın yazı, liste ve link destekler. TR/EN için üstteki dil seçicisini kullanın.";
+
+function paragraphsToLexical(...paragraphs: string[]) {
+  return textToLexical(paragraphs.join("\n\n"));
+}
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
@@ -133,16 +138,16 @@ export const SiteSettings: GlobalConfig = {
             },
             {
               name: "privacyBody",
-              type: "textarea",
+              type: "richText",
               label: "Metin",
               localized: true,
-              admin: { description: paraHint, rows: 12 },
-              defaultValue: [
+              admin: { description: richHint },
+              defaultValue: paragraphsToLexical(
                 "Kriptostore olarak sipariş ve hesap verilerinizi yalnızca siparişinizin işlenmesi, kargo, destek ve yasal yükümlülükler için kullanırız.",
                 "Ödeme Cryptomus üzerinden gerçekleşir; kart veya cüzdan özel anahtarlarınız bizde tutulmaz.",
                 "Verileriniz güvenli sunucularda saklanır; üçüncü taraflarla pazarlama amacıyla paylaşılmaz.",
-                "Haklarınız ve talepleriniz için iletişim sayfamızdaki e-posta veya formu kullanabilirsiniz.",
-              ].join("\n\n"),
+                "Haklarınız ve talepleriniz için iletişim sayfamızdaki e-posta veya formu kullanabilirsiniz."
+              ),
             },
           ],
         },
@@ -158,16 +163,16 @@ export const SiteSettings: GlobalConfig = {
             },
             {
               name: "termsBody",
-              type: "textarea",
+              type: "richText",
               label: "Metin",
               localized: true,
-              admin: { description: paraHint, rows: 12 },
-              defaultValue: [
+              admin: { description: richHint },
+              defaultValue: paragraphsToLexical(
                 "Site üzerinden verilen siparişler Cryptomus faturası oluşturulduğunda rezervasyon sayılır; ödeme onayından sonra kesinleşir.",
                 "Ürünler orijinal donanım cüzdanlarıdır; fiyatlar TRY cinsinden listelenir, ödeme kripto ile alınır.",
                 "Yanlış tutar veya iptal durumlarında sipariş durumu güncellenir; stok iadesi ödeme durumuna göre yönetilir.",
-                "Siteyi kullanarak bu koşulları kabul etmiş sayılırsınız. Uyuşmazlıklarda öncelikle destek kanalımızla iletişime geçin.",
-              ].join("\n\n"),
+                "Siteyi kullanarak bu koşulları kabul etmiş sayılırsınız. Uyuşmazlıklarda öncelikle destek kanalımızla iletişime geçin."
+              ),
             },
           ],
         },
@@ -183,16 +188,16 @@ export const SiteSettings: GlobalConfig = {
             },
             {
               name: "returnsBody",
-              type: "textarea",
+              type: "richText",
               label: "Metin",
               localized: true,
-              admin: { description: paraHint, rows: 12 },
-              defaultValue: [
+              admin: { description: richHint },
+              defaultValue: paragraphsToLexical(
                 "Ödeme tamamlanmadan iptal edilen Cryptomus faturalarında sipariş iptal durumuna geçer; ödeme alınmamışsa ücret iadesi gerekmez.",
                 "Açılmamış, mühürlü donanım ürünlerinde yasal cayma hakkı kapsamında iade talepleri değerlendirilir.",
                 "Açılmış veya aktive edilmiş cihazlarda güvenlik nedeniyle iade kısıtlı olabilir.",
-                "İade talepleri için sipariş numaranız ve e-postanız ile iletişim formunu veya destek e-postasını kullanın. Onaylanan iadeler Cryptomus / ödeme kanalı üzerinden işlenir.",
-              ].join("\n\n"),
+                "İade talepleri için sipariş numaranız ve e-postanız ile iletişim formunu veya destek e-postasını kullanın. Onaylanan iadeler Cryptomus / ödeme kanalı üzerinden işlenir."
+              ),
             },
           ],
         },
@@ -208,16 +213,16 @@ export const SiteSettings: GlobalConfig = {
             },
             {
               name: "kvkkBody",
-              type: "textarea",
+              type: "richText",
               label: "Metin",
               localized: true,
-              admin: { description: paraHint, rows: 12 },
-              defaultValue: [
+              admin: { description: richHint },
+              defaultValue: paragraphsToLexical(
                 "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında; ad, e-posta, telefon ve teslimat adresi sipariş süreçleri için işlenir.",
                 "Amaç: sözleşme ifası, müşteri desteği ve yasal zorunluluklar.",
                 "Haklarınız: erişim, düzeltme, silme ve itiraz. Taleplerinizi destek e-postası veya iletişim formu ile iletebilirsiniz.",
-                "Saklama süresi: sipariş ve muhasebe yükümlülükleri süresince; ardından silinir veya anonimleştirilir.",
-              ].join("\n\n"),
+                "Saklama süresi: sipariş ve muhasebe yükümlülükleri süresince; ardından silinir veya anonimleştirilir."
+              ),
             },
           ],
         },

@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { RichTextValue } from "@/lib/lexical";
 
 export type Locale = "tr" | "en";
 
@@ -274,7 +275,10 @@ export function productShort(
 }
 
 export function productDesc(
-  p: { description: string; descriptionEn?: string },
+  p: {
+    description: RichTextValue | null;
+    descriptionEn?: RichTextValue | null;
+  },
   locale: Locale
 ) {
   return locale === "en" && p.descriptionEn ? p.descriptionEn : p.description;

@@ -44,18 +44,40 @@ export const HeroBanners: CollectionConfig = {
               name: "image",
               type: "upload",
               relationTo: "media",
-              label: "Banner görseli",
+              localized: true,
+              label: "Desktop banner",
               admin: {
                 description:
-                  "Tek başına yeterli. Metin eklemezsen full-bleed görsel gösterilir.",
+                  "Önerilen: 1920×1080 (veya 1920×900). TR/EN için üstteki dil seçicisini kullanın — metin görselin içindeyse her dil ayrı yüklenir.",
+              },
+            },
+            {
+              name: "imageMobile",
+              type: "upload",
+              relationTo: "media",
+              localized: true,
+              label: "Mobile banner",
+              admin: {
+                description:
+                  "Önerilen: 768×1200 / 750×1334. Boşsa desktop kullanılır. Dil seçicisi ile TR/EN ayrı.",
               },
             },
             {
               name: "imageUrl",
               type: "text",
-              label: "Harici görsel URL",
+              localized: true,
+              label: "Harici desktop URL",
               admin: {
                 description: "Upload yoksa kullanılır (CDN / Unsplash).",
+              },
+            },
+            {
+              name: "imageUrlMobile",
+              type: "text",
+              localized: true,
+              label: "Harici mobile URL",
+              admin: {
+                description: "Mobil upload yoksa. Boşsa desktop URL / görsel.",
               },
             },
             {

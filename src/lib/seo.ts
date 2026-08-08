@@ -5,7 +5,9 @@ import {
   BRAND_TAGLINE_TR,
   siteUrl,
 } from "@/lib/brand";
+import { lexicalPlaintext } from "@/lib/lexical";
 import type { Product } from "@/lib/types";
+import type { RichTextValue } from "@/lib/lexical";
 
 export function absoluteUrl(pathOrUrl: string): string {
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
@@ -74,7 +76,7 @@ export function productJsonLd(product: Product) {
     name: product.name,
     description:
       product.shortDescription ||
-      product.description ||
+      lexicalPlaintext(product.description) ||
       `${product.name} — ${product.brand}`,
     sku: product.slug,
     brand: {
@@ -122,7 +124,7 @@ export function breadcrumbJsonLd(
 }
 
 export function faqJsonLd(
-  faqs: { question: string; answer: string }[]
+  faqs: { question: string; answer: string | RichTextValue }[]
 ): Record<string, unknown> | null {
   if (!faqs.length) return null;
   return {
@@ -133,7 +135,10 @@ export function faqJsonLd(
       name: f.question,
       acceptedAnswer: {
         "@type": "Answer",
-        text: f.answer,
+        text:
+          typeof f.answer === "string"
+            ? f.answer
+            : lexicalPlaintext(f.answer),
       },
     })),
   };

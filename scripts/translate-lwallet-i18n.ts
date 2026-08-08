@@ -9,6 +9,7 @@
 import "dotenv/config";
 import { getPayload } from "payload";
 import config from "../src/payload.config";
+import { lexicalPlaintext, textToLexical } from "../src/lib/lexical";
 
 const TITLE_MAP: Record<string, { tr: string; en: string }> = {
   "Про пристрій": { tr: "Cihaz hakkında", en: "About the device" },
@@ -115,7 +116,7 @@ async function main() {
         "en"
       );
 
-      const descSrc = String(doc.description || "");
+      const descSrc = lexicalPlaintext(doc.description) || "";
       const descTr = hasCyrillic(descSrc) ? await gtx(descSrc, "tr") : descSrc;
       const descEn = await gtx(hasCyrillic(descSrc) ? descSrc : descTr, "en");
 
@@ -126,17 +127,18 @@ async function main() {
       const sectionsEn = [];
       for (const s of sections) {
         if (!s?.title || !s?.body) continue;
+        const bodySrc = lexicalPlaintext(s.body) || String(s.body || "");
         const titleTr = await mapTitle(String(s.title), "tr");
-        const bodyTr = hasCyrillic(String(s.body))
-          ? await gtx(String(s.body), "tr")
-          : String(s.body);
+        const bodyTr = hasCyrillic(bodySrc)
+          ? await gtx(bodySrc, "tr")
+          : bodySrc;
         const titleEn = await mapTitle(String(s.title), "en");
         const bodyEn = await gtx(
-          hasCyrillic(String(s.body)) ? String(s.body) : bodyTr,
+          hasCyrillic(bodySrc) ? bodySrc : bodyTr,
           "en"
         );
-        sectionsTr.push({ title: titleTr, body: bodyTr });
-        sectionsEn.push({ title: titleEn, body: bodyEn });
+        sectionsTr.push({ title: titleTr, body: textToLexical(bodyTr) });
+        sectionsEn.push({ title: titleEn, body: textToLexical(bodyEn) });
       }
 
       const faqs = Array.isArray(doc.faqs) ? doc.faqs : [];
@@ -144,22 +146,18 @@ async function main() {
       const faqsEn = [];
       for (const f of faqs) {
         if (!f?.question || !f?.answer) continue;
+        const aSrc = lexicalPlaintext(f.answer) || String(f.answer || "");
         const qTr = hasCyrillic(String(f.question))
           ? await gtx(String(f.question), "tr")
           : String(f.question);
-        const aTr = hasCyrillic(String(f.answer))
-          ? await gtx(String(f.answer), "tr")
-          : String(f.answer);
+        const aTr = hasCyrillic(aSrc) ? await gtx(aSrc, "tr") : aSrc;
         const qEn = await gtx(
           hasCyrillic(String(f.question)) ? String(f.question) : qTr,
           "en"
         );
-        const aEn = await gtx(
-          hasCyrillic(String(f.answer)) ? String(f.answer) : aTr,
-          "en"
-        );
-        faqsTr.push({ question: qTr, answer: aTr });
-        faqsEn.push({ question: qEn, answer: aEn });
+        const aEn = await gtx(hasCyrillic(aSrc) ? aSrc : aTr, "en");
+        faqsTr.push({ question: qTr, answer: textToLexical(aTr) });
+        faqsEn.push({ question: qEn, answer: textToLexical(aEn) });
       }
 
       const features = Array.isArray(doc.features) ? doc.features : [];
@@ -180,7 +178,7 @@ async function main() {
         locale: "tr",
         data: {
           shortDescription: shortTr,
-          description: descTr,
+          description: textToLexical(descTr),
           detailSections: sectionsTr,
           faqs: faqsTr,
           features: featuresTr,
@@ -194,7 +192,7 @@ async function main() {
         locale: "en",
         data: {
           shortDescription: shortEn,
-          description: descEn,
+          description: textToLexical(descEn),
           detailSections: sectionsEn,
           faqs: faqsEn,
           features: featuresEn,

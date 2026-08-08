@@ -3,8 +3,10 @@ import {
   DEFAULT_SITE_CONTACT,
   type LegalPageContent,
   type LocalePair,
+  type RichLocalePair,
   type SiteContact,
 } from "@/lib/site-contact";
+import { normalizeLexical, textToLexical, type RichTextValue } from "@/lib/lexical";
 
 export type { SiteContact } from "@/lib/site-contact";
 export {
@@ -13,6 +15,7 @@ export {
   formatAddress,
   formatAddressOneLine,
   pickLocale,
+  pickRichLocale,
 } from "@/lib/site-contact";
 
 function str(v: unknown, fallback = ""): string {
@@ -33,6 +36,27 @@ function asPair(v: unknown, fallback: LocalePair): LocalePair {
   return { ...fallback };
 }
 
+function asRich(v: unknown, fallback: RichTextValue): RichTextValue {
+  return normalizeLexical(v) || fallback;
+}
+
+function asRichPair(v: unknown, fallback: RichLocalePair): RichLocalePair {
+  if (v && typeof v === "object" && !Array.isArray(v) && !("root" in v)) {
+    const o = v as { tr?: unknown; en?: unknown };
+    return {
+      tr: asRich(o.tr, fallback.tr),
+      en: asRich(o.en, fallback.en),
+    };
+  }
+  if (typeof v === "string" && v.trim()) {
+    const lex = textToLexical(v.trim());
+    return { tr: lex, en: lex };
+  }
+  const single = normalizeLexical(v);
+  if (single) return { tr: single, en: single };
+  return { tr: fallback.tr, en: fallback.en };
+}
+
 function asLegal(
   title: unknown,
   body: unknown,
@@ -40,7 +64,7 @@ function asLegal(
 ): LegalPageContent {
   return {
     title: asPair(title, fallback.title),
-    body: asPair(body, fallback.body),
+    body: asRichPair(body, fallback.body),
   };
 }
 

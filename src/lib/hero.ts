@@ -1,4 +1,7 @@
-import type { HeroBanner as PayloadHeroBanner, Product as PayloadProduct } from "@/payload-types";
+import type {
+  HeroBanner as PayloadHeroBanner,
+  Product as PayloadProduct,
+} from "@/payload-types";
 import { getPayloadClient } from "@/lib/payload";
 import { mapProduct } from "@/lib/products";
 import type { Product } from "@/lib/types";
@@ -24,7 +27,14 @@ export type HeroSlide = {
   secondaryLabel?: string;
   secondaryLabelEn?: string;
   secondaryHref?: string;
+  /** Desktop banner TR */
   imageUrl?: string;
+  /** Desktop banner EN */
+  imageUrlEn?: string;
+  /** Mobile banner TR (falls back to desktop) */
+  imageUrlMobile?: string;
+  /** Mobile banner EN (falls back to desktop EN / TR) */
+  imageUrlMobileEn?: string;
   product?: Product | null;
   showPrice: boolean;
   layout: HeroLayout;
@@ -39,6 +49,15 @@ export type HeroSlide = {
 
 type MediaLike = { url?: string | null };
 type LocalizedString = string | { tr?: string | null; en?: string | null } | null;
+type LocalizedUpload =
+  | number
+  | MediaLike
+  | {
+      tr?: number | MediaLike | null;
+      en?: number | MediaLike | null;
+    }
+  | null
+  | undefined;
 
 function pickLocale(
   value: LocalizedString,
@@ -49,11 +68,29 @@ function pickLocale(
   return value[locale] ?? value.tr ?? value.en ?? undefined;
 }
 
-function mediaUrl(
-  image: PayloadHeroBanner["image"]
-): string | undefined {
+function mediaUrl(image: number | MediaLike | null | undefined): string | undefined {
   if (!image || typeof image === "number") return undefined;
-  return (image as MediaLike).url ?? undefined;
+  return image.url ?? undefined;
+}
+
+function pickLocalizedUpload(
+  value: LocalizedUpload,
+  locale: "tr" | "en"
+): string | undefined {
+  if (value == null) return undefined;
+  if (typeof value === "number") return undefined;
+  if ("url" in value || (!("tr" in value) && !("en" in value))) {
+    return mediaUrl(value as MediaLike);
+  }
+  const loc = value as {
+    tr?: number | MediaLike | null;
+    en?: number | MediaLike | null;
+  };
+  return (
+    mediaUrl(loc[locale] ?? undefined) ||
+    mediaUrl(loc.tr ?? undefined) ||
+    mediaUrl(loc.en ?? undefined)
+  );
 }
 
 function firstHttp(
@@ -74,6 +111,17 @@ function firstAny(
   return undefined;
 }
 
+function resolveSlot(opts: {
+  imageUrl?: string;
+  uploaded?: string;
+  productFallback?: string;
+}): string | undefined {
+  return (
+    firstHttp(opts.imageUrl, opts.productFallback, opts.uploaded) ||
+    firstAny(opts.imageUrl, opts.uploaded, opts.productFallback)
+  );
+}
+
 function resolveProduct(
   rel: PayloadHeroBanner["product"]
 ): Product | null {
@@ -83,16 +131,51 @@ function resolveProduct(
 
 export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
   const product = resolveProduct(doc.product);
-  const uploaded = mediaUrl(doc.image);
-  // Prefer remote CDN / Unsplash over local /api/media (often missing on Hostinger)
-  const imageUrl =
-    firstHttp(
-      doc.imageUrl,
-      product?.image,
-      product?.images?.[0],
-      uploaded
-    ) ||
-    firstAny(doc.imageUrl, uploaded, product?.image, product?.images?.[0]);
+  const productImg = product?.image || product?.images?.[0];
+
+  const uploadedTr = pickLocalizedUpload(
+    doc.image as LocalizedUpload,
+    "tr"
+  );
+  const uploadedEn = pickLocalizedUpload(
+    doc.image as LocalizedUpload,
+    "en"
+  );
+  const uploadedMobileTr = pickLocalizedUpload(
+    doc.imageMobile as LocalizedUpload,
+    "tr"
+  );
+  const uploadedMobileEn = pickLocalizedUpload(
+    doc.imageMobile as LocalizedUpload,
+    "en"
+  );
+
+  const urlTr = pickLocale(doc.imageUrl as LocalizedString, "tr");
+  const urlEn = pickLocale(doc.imageUrl as LocalizedString, "en");
+  const urlMobileTr = pickLocale(doc.imageUrlMobile as LocalizedString, "tr");
+  const urlMobileEn = pickLocale(doc.imageUrlMobile as LocalizedString, "en");
+
+  const imageUrl = resolveSlot({
+    imageUrl: urlTr,
+    uploaded: uploadedTr,
+    productFallback: productImg,
+  });
+  const imageUrlEn =
+    resolveSlot({
+      imageUrl: urlEn,
+      uploaded: uploadedEn,
+    }) || imageUrl;
+
+  const imageUrlMobile =
+    resolveSlot({
+      imageUrl: urlMobileTr,
+      uploaded: uploadedMobileTr,
+    }) || undefined;
+  const imageUrlMobileEn =
+    resolveSlot({
+      imageUrl: urlMobileEn,
+      uploaded: uploadedMobileEn,
+    }) || undefined;
 
   return {
     id: String(doc.id),
@@ -110,6 +193,9 @@ export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
     secondaryLabelEn: pickLocale(doc.secondaryLabel as LocalizedString, "en"),
     secondaryHref: doc.secondaryHref || undefined,
     imageUrl,
+    imageUrlEn,
+    imageUrlMobile,
+    imageUrlMobileEn,
     product,
     showPrice: Boolean(doc.showPrice),
     layout: (doc.layout as HeroLayout) || "textOverlay",

@@ -1,8 +1,11 @@
+import { textToLexical, type RichTextValue } from "@/lib/lexical";
+
 export type LocalePair = { tr: string; en: string };
+export type RichLocalePair = { tr: RichTextValue; en: RichTextValue };
 
 export type LegalPageContent = {
   title: LocalePair;
-  body: LocalePair;
+  body: RichLocalePair;
 };
 
 export type SiteContact = {
@@ -30,6 +33,10 @@ function pair(tr: string, en: string): LocalePair {
   return { tr, en };
 }
 
+function richPair(tr: string, en: string): RichLocalePair {
+  return { tr: textToLexical(tr), en: textToLexical(en) };
+}
+
 function legal(
   titleTr: string,
   titleEn: string,
@@ -38,7 +45,7 @@ function legal(
 ): LegalPageContent {
   return {
     title: pair(titleTr, titleEn),
-    body: pair(bodyTr, bodyEn),
+    body: richPair(bodyTr, bodyEn),
   };
 }
 
@@ -149,6 +156,16 @@ export function pickLocale(
   return value[locale] || value.tr || value.en || "";
 }
 
+export function pickRichLocale(
+  value: RichLocalePair | RichTextValue | undefined,
+  locale: "tr" | "en"
+): RichTextValue | null {
+  if (!value) return null;
+  if ("root" in value) return value as RichTextValue;
+  return value[locale] || value.tr || value.en || null;
+}
+
+/** @deprecated Prefer RichText component; kept for plain-string fallbacks */
 export function bodyParagraphs(body: string): string[] {
   return body
     .split(/\n\s*\n/)

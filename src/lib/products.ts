@@ -1,5 +1,10 @@
 import type { Product as PayloadProduct } from "@/payload-types";
 import { getPayloadClient } from "@/lib/payload";
+import {
+  cleanFaq,
+  cleanSection,
+  stripShortcodeArtifacts,
+} from "@/lib/sanitizeCopy";
 import type { Product } from "@/lib/types";
 
 type MediaLike = {
@@ -72,18 +77,28 @@ export function mapProduct(doc: PayloadProduct): Product {
     name,
     nameEn,
     brand: doc.brand,
-    shortDescription:
-      pickLocale(doc.shortDescription as LocalizedString, "tr") || "",
-    shortDescriptionEn: pickLocale(
-      doc.shortDescription as LocalizedString,
-      "en"
+    shortDescription: stripShortcodeArtifacts(
+      pickLocale(doc.shortDescription as LocalizedString, "tr") || ""
     ),
-    description: pickLocale(doc.description as LocalizedString, "tr") || "",
-    descriptionEn: pickLocale(doc.description as LocalizedString, "en"),
+    shortDescriptionEn: (() => {
+      const v = pickLocale(doc.shortDescription as LocalizedString, "en");
+      return v ? stripShortcodeArtifacts(v) : undefined;
+    })(),
+    description: stripShortcodeArtifacts(
+      pickLocale(doc.description as LocalizedString, "tr") || ""
+    ),
+    descriptionEn: (() => {
+      const v = pickLocale(doc.description as LocalizedString, "en");
+      return v ? stripShortcodeArtifacts(v) : undefined;
+    })(),
     price: doc.price,
     currency: doc.currency,
-    features: pickLocaleList(doc.features as LocalizedStrings, "tr"),
-    featuresEn: pickLocaleList(doc.features as LocalizedStrings, "en"),
+    features: pickLocaleList(doc.features as LocalizedStrings, "tr").map(
+      stripShortcodeArtifacts
+    ),
+    featuresEn: pickLocaleList(doc.features as LocalizedStrings, "en").map(
+      stripShortcodeArtifacts
+    ),
     inStock: Boolean(doc.inStock) && (doc.stockQty ?? 0) > 0,
     stockQty: typeof doc.stockQty === "number" ? doc.stockQty : 0,
     accent: doc.accent || "#9aa4b2",
@@ -92,7 +107,10 @@ export function mapProduct(doc: PayloadProduct): Product {
     detailSections: Array.isArray(doc.detailSections)
       ? doc.detailSections
           .filter((s) => s?.title && s?.body)
-          .map((s) => ({ title: String(s.title), body: String(s.body) }))
+          .map((s) =>
+            cleanSection({ title: String(s.title), body: String(s.body) })
+          )
+          .filter((s) => s.title && s.body)
       : [],
     detailSectionsEn: (() => {
       const raw = (doc as { detailSections?: unknown }).detailSections;
@@ -102,7 +120,10 @@ export function mapProduct(doc: PayloadProduct): Product {
         if (Array.isArray(en)) {
           return en
             .filter((s) => s?.title && s?.body)
-            .map((s) => ({ title: String(s.title), body: String(s.body) }));
+            .map((s) =>
+              cleanSection({ title: String(s.title), body: String(s.body) })
+            )
+            .filter((s) => s.title && s.body);
         }
       }
       return undefined;
@@ -110,10 +131,13 @@ export function mapProduct(doc: PayloadProduct): Product {
     faqs: Array.isArray(doc.faqs)
       ? doc.faqs
           .filter((f) => f?.question && f?.answer)
-          .map((f) => ({
-            question: String(f.question),
-            answer: String(f.answer),
-          }))
+          .map((f) =>
+            cleanFaq({
+              question: String(f.question),
+              answer: String(f.answer),
+            })
+          )
+          .filter((f) => f.question && f.answer)
       : [],
     faqsEn: (() => {
       const raw = (doc as { faqs?: unknown }).faqs;
@@ -123,10 +147,13 @@ export function mapProduct(doc: PayloadProduct): Product {
         if (Array.isArray(en)) {
           return en
             .filter((f) => f?.question && f?.answer)
-            .map((f) => ({
-              question: String(f.question),
-              answer: String(f.answer),
-            }));
+            .map((f) =>
+              cleanFaq({
+                question: String(f.question),
+                answer: String(f.answer),
+              })
+            )
+            .filter((f) => f.question && f.answer);
         }
       }
       return undefined;
@@ -217,7 +244,10 @@ export async function getProductBySlug(
     Array.isArray(rows)
       ? rows
           .filter((s) => s?.title && s?.body)
-          .map((s) => ({ title: String(s.title), body: String(s.body) }))
+          .map((s) =>
+            cleanSection({ title: String(s.title), body: String(s.body) })
+          )
+          .filter((s) => s.title && s.body)
       : [];
 
   const mapFaqs = (
@@ -229,10 +259,13 @@ export async function getProductBySlug(
     Array.isArray(rows)
       ? rows
           .filter((f) => f?.question && f?.answer)
-          .map((f) => ({
-            question: String(f.question),
-            answer: String(f.answer),
-          }))
+          .map((f) =>
+            cleanFaq({
+              question: String(f.question),
+              answer: String(f.answer),
+            })
+          )
+          .filter((f) => f.question && f.answer)
       : [];
 
   product.detailSections = mapSections(tr.detailSections);

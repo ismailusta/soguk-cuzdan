@@ -24,6 +24,7 @@
     "lwallet:enrich": "tsx scripts/enrich-lwallet-content.ts",
     "lwallet:translate": "tsx scripts/translate-lwallet-i18n.ts",
     "db:push": "tsx scripts/push-schema.ts",
+    "db:storage:media": "tsx scripts/create-supabase-media-bucket.ts",
     "db:setup": "npm run db:up && npm run db:seed",
     "test": "tsx --test src/lib/cryptomus.test.ts"
   },
@@ -32,6 +33,7 @@
     "@payloadcms/email-nodemailer": "^3.87.0",
     "@payloadcms/next": "^3.87.0",
     "@payloadcms/richtext-lexical": "^3.87.0",
+    "@payloadcms/storage-s3": "^3.87.0",
     "@tailwindcss/postcss": "^4",
     "dotenv": "^17.4.2",
     "graphql": "^16.14.2",

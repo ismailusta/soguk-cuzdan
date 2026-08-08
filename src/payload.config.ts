@@ -1,6 +1,7 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { s3Storage } from "@payloadcms/storage-s3";
 import { en } from "@payloadcms/translations/languages/en";
 import { tr } from "@payloadcms/translations/languages/tr";
 import path from "path";
@@ -72,6 +73,16 @@ const email = smtpPass
     })
   : undefined;
 
+const s3Bucket = process.env.S3_BUCKET?.trim();
+const s3AccessKeyId = process.env.S3_ACCESS_KEY_ID?.trim();
+const s3SecretAccessKey = process.env.S3_SECRET_ACCESS_KEY?.trim();
+const s3Endpoint = process.env.S3_ENDPOINT?.trim();
+const s3Region = process.env.S3_REGION?.trim() || "eu-west-2";
+const s3PublicUrl = process.env.S3_PUBLIC_URL?.trim()?.replace(/\/$/, "");
+const s3Enabled = Boolean(
+  s3Bucket && s3AccessKeyId && s3SecretAccessKey && s3Endpoint
+);
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -104,6 +115,33 @@ export default buildConfig({
     push: process.env.PAYLOAD_DATABASE_PUSH !== "false",
   }),
   sharp,
+  plugins: [
+    s3Storage({
+      enabled: s3Enabled,
+      collections: {
+        media: s3PublicUrl
+          ? {
+              disablePayloadAccessControl: true,
+              generateFileURL: ({ filename, prefix }) => {
+                if (!filename) return "";
+                const key = prefix ? `${prefix}/${filename}` : filename;
+                return `${s3PublicUrl}/${key}`;
+              },
+            }
+          : true,
+      },
+      bucket: s3Bucket || "media",
+      config: {
+        credentials: {
+          accessKeyId: s3AccessKeyId || "",
+          secretAccessKey: s3SecretAccessKey || "",
+        },
+        region: s3Region,
+        endpoint: s3Endpoint,
+        forcePathStyle: process.env.S3_FORCE_PATH_STYLE !== "false",
+      },
+    }),
+  ],
   // Admin panel UI language (Account → Language)
   i18n: {
     supportedLanguages: { tr, en },

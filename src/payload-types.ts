@@ -96,8 +96,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('tr' | 'en') | ('tr' | 'en')[];
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: 'tr' | 'en';
   widgets: {
     collections: CollectionsWidget;
@@ -324,7 +328,7 @@ export interface Order {
   createdAt: string;
 }
 /**
- * Anasayfa hero slide’ları. Başlıkta Enter ile satır kır. Sıra: küçük sayı önce.
+ * Anasayfa hero slide’ları. Sadece görsel de ekleyebilirsin — başlık/CTA zorunlu değil. Sıra: küçük sayı önce.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "hero-banners".
@@ -337,27 +341,11 @@ export interface HeroBanner {
    */
   order?: number | null;
   /**
-   * Her satır Enter ile kırılır. Örn:
-   * LEDGER
-   * STAX
+   * Tek başına yeterli. Metin eklemezsen full-bleed görsel gösterilir.
    */
-  title: string;
-  subtitle?: string | null;
-  /**
-   * Boş bırakılırsa rozet gösterilmez.
-   */
-  badge?: string | null;
-  badgeTone?: ('accent' | 'success' | 'danger' | 'muted') | null;
-  ctaLabel?: string | null;
-  /**
-   * Boşsa ürün seçiliyse /urun/slug, değilse /urunler
-   */
-  ctaHref?: string | null;
-  secondaryLabel?: string | null;
-  secondaryHref?: string | null;
   image?: (number | null) | Media;
   /**
-   * Upload yoksa kullanılır.
+   * Upload yoksa kullanılır (CDN / Unsplash).
    */
   imageUrl?: string | null;
   /**
@@ -366,7 +354,27 @@ export interface HeroBanner {
   product?: (number | null) | Product;
   showPrice?: boolean | null;
   /**
-   * Tüm slide’lar full-bleed arka plan + üstünde metin. Bu alan sadece hizayı etkiler.
+   * Boş bırakılabilir (sadece görsel banner). Enter ile satır kırılır.
+   */
+  title?: string | null;
+  subtitle?: string | null;
+  /**
+   * Boş bırakılırsa rozet gösterilmez.
+   */
+  badge?: string | null;
+  badgeTone?: ('accent' | 'success' | 'danger' | 'muted') | null;
+  /**
+   * Boşsa buton gösterilmez.
+   */
+  ctaLabel?: string | null;
+  /**
+   * Boşsa ürün seçiliyse /urun/slug, değilse /urunler
+   */
+  ctaHref?: string | null;
+  secondaryLabel?: string | null;
+  secondaryHref?: string | null;
+  /**
+   * Tüm slide’lar full-bleed arka plan. Metin yoksa sadece görsel.
    */
   layout: 'textOverlay' | 'textLeft' | 'textRight';
   titleSize?: ('sm' | 'md' | 'lg' | 'xl') | null;
@@ -637,6 +645,10 @@ export interface OrdersSelect<T extends boolean = true> {
 export interface HeroBannersSelect<T extends boolean = true> {
   active?: T;
   order?: T;
+  image?: T;
+  imageUrl?: T;
+  product?: T;
+  showPrice?: T;
   title?: T;
   subtitle?: T;
   badge?: T;
@@ -645,10 +657,6 @@ export interface HeroBannersSelect<T extends boolean = true> {
   ctaHref?: T;
   secondaryLabel?: T;
   secondaryHref?: T;
-  image?: T;
-  imageUrl?: T;
-  product?: T;
-  showPrice?: T;
   layout?: T;
   titleSize?: T;
   subtitleSize?: T;
@@ -699,6 +707,88 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * İletişim, adres ve yasal sayfa metinleri (Gizlilik, TOS, İade, KVKK). Sitede anında yansır.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  companyLegalName: string;
+  contactEmail: string;
+  contactPhone?: string | null;
+  /**
+   * Uluslararası format, örn. +905xxxxxxxxx
+   */
+  whatsapp?: string | null;
+  supportHours?: string | null;
+  contactPageTitle?: string | null;
+  contactPageIntro?: string | null;
+  addressLine1: string;
+  addressLine2?: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  privacyTitle?: string | null;
+  /**
+   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   */
+  privacyBody?: string | null;
+  termsTitle?: string | null;
+  /**
+   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   */
+  termsBody?: string | null;
+  returnsTitle?: string | null;
+  /**
+   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   */
+  returnsBody?: string | null;
+  kvkkTitle?: string | null;
+  /**
+   * Her paragrafı boş satırla ayırın. TR/EN için üstteki dil seçicisini kullanın.
+   */
+  kvkkBody?: string | null;
+  /**
+   * Yasal sayfalarda ve moderasyon metninde gösterilir.
+   */
+  productOrigin?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  companyLegalName?: T;
+  contactEmail?: T;
+  contactPhone?: T;
+  whatsapp?: T;
+  supportHours?: T;
+  contactPageTitle?: T;
+  contactPageIntro?: T;
+  addressLine1?: T;
+  addressLine2?: T;
+  city?: T;
+  state?: T;
+  postalCode?: T;
+  country?: T;
+  privacyTitle?: T;
+  privacyBody?: T;
+  termsTitle?: T;
+  termsBody?: T;
+  returnsTitle?: T;
+  returnsBody?: T;
+  kvkkTitle?: T;
+  kvkkBody?: T;
+  productOrigin?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

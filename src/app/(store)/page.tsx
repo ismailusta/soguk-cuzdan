@@ -16,11 +16,11 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Pull hero under transparent fixed navbar */}
+      {/* Pull hero under transparent fixed navbar — first paint = full viewport */}
       <div className="-mt-[64px] md:-mt-[72px]">
         <Hero banners={banners} />
       </div>
-      {/* Category strip stays strictly below the hero */}
+      {/* Brands + products only after scroll */}
       <HomeSections products={grid} brands={brands} />
     </>
   );

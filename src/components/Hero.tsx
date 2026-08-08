@@ -126,9 +126,9 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const showBg = Boolean(slide.imageUrl) && !bgBroken;
 
   return (
-    <section className="animate-fade relative z-0 w-full">
+    <section className="relative z-0 w-full">
       <div
-        className="relative w-full overflow-hidden"
+        className="relative h-[100dvh] min-h-[100svh] w-full overflow-hidden"
         style={{
           background: `linear-gradient(135deg, ${from}, ${to})`,
         }}
@@ -166,7 +166,7 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
         )}
 
         <div
-          className={`relative z-[2] mx-auto flex min-h-[420px] max-w-[900px] flex-col justify-center px-5 py-16 md:min-h-[520px] md:py-20 ${
+          className={`relative z-[2] mx-auto flex h-full max-w-[900px] flex-col justify-center px-5 py-20 md:py-24 ${
             alignCenter ? "items-center text-center" : "items-start text-left"
           } ${hasOverlayText ? "" : "pointer-events-none"}`}
         >

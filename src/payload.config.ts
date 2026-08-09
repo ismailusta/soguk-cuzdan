@@ -101,6 +101,15 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
+  // Server-path uploads (fallback). Client uploads bypass Hostinger body limits.
+  upload: {
+    abortOnLimit: true,
+    limits: {
+      fileSize: 50 * 1024 * 1024, // 50MB
+    },
+    uploadTimeout: 120_000,
+    useTempFiles: true,
+  },
   db: postgresAdapter({
     pool: {
       connectionString: databaseUrl,
@@ -118,6 +127,9 @@ export default buildConfig({
   plugins: [
     s3Storage({
       enabled: s3Enabled,
+      // Browser → S3 directly (Hostinger/proxy body limits kill ~10MB+ videos).
+      // Bucket CORS must allow PUT from the admin origin.
+      clientUploads: true,
       collections: {
         media: s3PublicUrl
           ? {

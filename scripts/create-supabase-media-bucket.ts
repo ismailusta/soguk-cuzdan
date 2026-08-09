@@ -14,7 +14,18 @@ VALUES (
   'media',
   true,
   52428800,
-  ARRAY['image/png','image/jpeg','image/jpg','image/webp','image/gif','image/svg+xml']::text[]
+  ARRAY[
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/webp',
+    'image/avif',
+    'image/gif',
+    'image/svg+xml',
+    'video/mp4',
+    'video/webm',
+    'video/quicktime'
+  ]::text[]
 )
 ON CONFLICT (id) DO UPDATE SET
   public = EXCLUDED.public,

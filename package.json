@@ -27,6 +27,7 @@
     "db:migrate:richtext": "tsx scripts/migrate-richtext.ts",
     "db:storage:media": "tsx scripts/create-supabase-media-bucket.ts",
     "db:storage:allow-video": "tsx scripts/allow-media-video-mimes.ts",
+    "db:scrub:ukraine": "tsx scripts/scrub-ukraine-copy.ts",
     "db:setup": "npm run db:up && npm run db:seed",
     "test": "tsx --test src/lib/cryptomus.test.ts"
   },

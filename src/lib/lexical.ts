@@ -1,7 +1,20 @@
-import type { SerializedEditorState } from "lexical";
-import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext";
+/**
+ * Client-safe Lexical helpers (no Payload Node adapters).
+ * Server code may still use @payloadcms/richtext-lexical/plaintext where needed.
+ */
 
-export type RichTextValue = SerializedEditorState;
+export type RichTextValue = {
+  root: {
+    type: string;
+    children: unknown[];
+    direction?: ("ltr" | "rtl") | null;
+    format?: string;
+    indent?: number;
+    version?: number;
+    [k: string]: unknown;
+  };
+  [k: string]: unknown;
+};
 
 function paragraphNode(text: string) {
   return {
@@ -74,14 +87,46 @@ export function normalizeLexical(value: unknown): RichTextValue | null {
   return null;
 }
 
+function collectText(node: unknown, out: string[]): void {
+  if (node == null) return;
+  if (typeof node === "string") {
+    out.push(node);
+    return;
+  }
+  if (typeof node !== "object") return;
+  const n = node as {
+    text?: unknown;
+    type?: unknown;
+    children?: unknown;
+  };
+  if (typeof n.text === "string") out.push(n.text);
+  if (Array.isArray(n.children)) {
+    for (const child of n.children) collectText(child, out);
+  }
+  // Soft break between block-ish nodes
+  if (
+    typeof n.type === "string" &&
+    (n.type === "paragraph" ||
+      n.type === "heading" ||
+      n.type === "listitem" ||
+      n.type === "quote")
+  ) {
+    out.push("\n");
+  }
+}
+
+/** Plaintext for SEO / teasers — no Payload dependency. */
 export function lexicalPlaintext(value: unknown): string {
   const data = normalizeLexical(value);
   if (!data) return "";
-  try {
-    return convertLexicalToPlaintext({ data }).trim();
-  } catch {
-    return "";
-  }
+  const parts: string[] = [];
+  collectText(data.root, parts);
+  return parts
+    .join("")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
 }
 
 export function hasRichText(value: unknown): boolean {

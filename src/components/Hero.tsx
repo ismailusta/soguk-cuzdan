@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { HeroSlide } from "@/lib/hero";
-import { isVideoMedia } from "@/lib/hero";
+import type { HeroSlide } from "@/lib/hero-shared";
+import { isVideoMedia } from "@/lib/hero-shared";
 import { useLocale } from "@/lib/i18n";
 import { formatPrice } from "@/lib/money";
 

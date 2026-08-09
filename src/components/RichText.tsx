@@ -1,4 +1,5 @@
 import { RichText as PayloadRichText } from "@payloadcms/richtext-lexical/react";
+import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import {
   hasRichText,
   normalizeLexical,
@@ -29,7 +30,7 @@ export function RichText({
 
   return (
     <PayloadRichText
-      data={normalized}
+      data={normalized as SerializedEditorState}
       className={`${PROSE} ${className}`.trim()}
     />
   );

@@ -5,55 +5,28 @@ import type {
 import { getPayloadClient } from "@/lib/payload";
 import { mapProduct } from "@/lib/products";
 import type { Product } from "@/lib/types";
+import type {
+  BadgeTone,
+  HeroLayout,
+  HeroSlide,
+  SubtitleSize,
+  TitleAlign,
+  TitleSize,
+} from "@/lib/hero-shared";
 
-export type HeroLayout = "textLeft" | "textRight" | "textOverlay";
-export type TitleSize = "sm" | "md" | "lg" | "xl";
-export type SubtitleSize = "sm" | "md" | "lg";
-export type TitleAlign = "left" | "center";
-export type BadgeTone = "accent" | "success" | "danger" | "muted";
+export type {
+  BadgeTone,
+  HeroLayout,
+  HeroSlide,
+  SubtitleSize,
+  TitleAlign,
+  TitleSize,
+} from "@/lib/hero-shared";
+export { isVideoMedia } from "@/lib/hero-shared";
 
-export type HeroMedia = {
+type HeroMedia = {
   url: string;
   mimeType?: string;
-};
-
-export type HeroSlide = {
-  id: string;
-  title?: string;
-  titleEn?: string;
-  subtitle?: string;
-  subtitleEn?: string;
-  badge?: string;
-  badgeEn?: string;
-  badgeTone: BadgeTone;
-  ctaLabel?: string;
-  ctaLabelEn?: string;
-  ctaHref?: string;
-  secondaryLabel?: string;
-  secondaryLabelEn?: string;
-  secondaryHref?: string;
-  /** Desktop banner TR */
-  imageUrl?: string;
-  /** Desktop banner EN */
-  imageUrlEn?: string;
-  /** Mobile banner TR (falls back to desktop) */
-  imageUrlMobile?: string;
-  /** Mobile banner EN (falls back to desktop EN / TR) */
-  imageUrlMobileEn?: string;
-  mimeType?: string;
-  mimeTypeEn?: string;
-  mimeTypeMobile?: string;
-  mimeTypeMobileEn?: string;
-  product?: Product | null;
-  showPrice: boolean;
-  layout: HeroLayout;
-  titleSize: TitleSize;
-  subtitleSize: SubtitleSize;
-  titleAlign: TitleAlign;
-  titleUppercase: boolean;
-  gradientFrom?: string;
-  gradientTo?: string;
-  accentGlow: boolean;
 };
 
 type MediaLike = {
@@ -70,12 +43,6 @@ type LocalizedUpload =
     }
   | null
   | undefined;
-
-export function isVideoMedia(url?: string | null, mimeType?: string | null): boolean {
-  if (mimeType && /^video\//i.test(mimeType)) return true;
-  if (!url) return false;
-  return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
-}
 
 function pickLocale(
   value: LocalizedString,
@@ -140,15 +107,7 @@ function resolveSlot(opts: {
     firstHttp(opts.imageUrl, opts.productFallback, opts.uploaded?.url) ||
     firstAny(opts.imageUrl, opts.uploaded?.url, opts.productFallback);
   if (!url) return undefined;
-  // Prefer uploaded mime when URL matches upload; else infer later from extension
-  const mime =
-    opts.uploaded?.url &&
-    (url === opts.uploaded.url || url.includes(opts.uploaded.url))
-      ? opts.uploaded.mimeType
-      : opts.uploaded?.url === url
-        ? opts.uploaded.mimeType
-        : undefined;
-  return { url, mimeType: mime || opts.uploaded?.mimeType };
+  return { url, mimeType: opts.uploaded?.mimeType };
 }
 
 function resolveProduct(

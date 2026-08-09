@@ -28,5 +28,8 @@ export const Media: CollectionConfig = {
       "video/webm",
       "video/quicktime",
     ],
+    // Videos aren't images — skip crop/focal UI noise
+    crop: false,
+    focalPoint: false,
   },
 };

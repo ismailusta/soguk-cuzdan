@@ -127,9 +127,11 @@ export default buildConfig({
   plugins: [
     s3Storage({
       enabled: s3Enabled,
-      // Browser → S3 directly (Hostinger/proxy body limits kill ~10MB+ videos).
-      // Bucket CORS must allow PUT from the admin origin.
-      clientUploads: true,
+      // Keep uploads server-side → S3 (SDK). Browser clientUploads needs Supabase
+      // Storage CORS + signed Content-Length; Hostinger often fails that path with
+      // "The following field is invalid: file" after a silent PUT failure.
+      // Re-enable with CORS configured if you need >~40MB videos.
+      clientUploads: false,
       collections: {
         media: s3PublicUrl
           ? {

@@ -10,7 +10,23 @@ export const Media: CollectionConfig = {
       name: "alt",
       type: "text",
       required: true,
+      admin: {
+        description: "Görsel/video açıklaması (erişilebilirlik).",
+      },
     },
   ],
-  upload: true,
+  upload: {
+    // Hero + ürün: WebP/AVIF/GIF + MP4/WebM
+    mimeTypes: [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/avif",
+      "image/gif",
+      "image/svg+xml",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime",
+    ],
+  },
 };

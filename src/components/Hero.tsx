@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { HeroSlide } from "@/lib/hero";
+import { isVideoMedia } from "@/lib/hero";
 import { useLocale } from "@/lib/i18n";
 import { formatPrice } from "@/lib/money";
 
@@ -71,32 +72,96 @@ function FallbackSlide({ locale }: { locale: "tr" | "en" }): HeroSlide {
 function HeroBackground({
   desktop,
   mobile,
+  desktopMime,
+  mobileMime,
   alt,
   onError,
 }: {
   desktop: string;
   mobile?: string;
+  desktopMime?: string;
+  mobileMime?: string;
   alt: string;
   onError: () => void;
 }) {
-  const imgClass = "absolute inset-0 z-0 h-full w-full object-cover";
-  if (mobile && mobile !== desktop) {
+  const mediaClass = "absolute inset-0 z-0 h-full w-full object-cover";
+  const desktopIsVideo = isVideoMedia(desktop, desktopMime);
+  const mobileSrc = mobile && mobile !== desktop ? mobile : undefined;
+  const mobileIsVideo = mobileSrc
+    ? isVideoMedia(mobileSrc, mobileMime || desktopMime)
+    : false;
+
+  if (mobileSrc) {
     return (
-      <picture>
-        <source media="(max-width: 767px)" srcSet={mobile} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={desktop}
-          alt={alt}
-          className={imgClass}
-          onError={onError}
-        />
-      </picture>
+      <>
+        {mobileIsVideo ? (
+          <video
+            key={`m-${mobileSrc}`}
+            className={`${mediaClass} md:hidden`}
+            src={mobileSrc}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onError={onError}
+            aria-label={alt}
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={mobileSrc}
+            alt={alt}
+            className={`${mediaClass} md:hidden`}
+            onError={onError}
+          />
+        )}
+        {desktopIsVideo ? (
+          <video
+            key={`d-${desktop}`}
+            className={`${mediaClass} hidden md:block`}
+            src={desktop}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onError={onError}
+            aria-label={alt}
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={desktop}
+            alt={alt}
+            className={`${mediaClass} hidden md:block`}
+            onError={onError}
+          />
+        )}
+      </>
     );
   }
+
+  if (desktopIsVideo) {
+    return (
+      <video
+        key={desktop}
+        className={mediaClass}
+        src={desktop}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onError={onError}
+        aria-label={alt}
+      />
+    );
+  }
+
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={desktop} alt={alt} className={imgClass} onError={onError} />
+    <img src={desktop} alt={alt} className={mediaClass} onError={onError} />
   );
 }
 
@@ -109,14 +174,6 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
 
   useEffect(() => {
     setIndex(0);
-  }, [slides.length]);
-
-  useEffect(() => {
-    if (slides.length < 2) return;
-    const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % slides.length);
-    }, 6500);
-    return () => window.clearInterval(id);
   }, [slides.length]);
 
   const slide = slides[index] ?? slides[0];
@@ -133,6 +190,9 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
   const desktopUrl = pick(locale, slide.imageUrl, slide.imageUrlEn);
   const mobileUrl =
     pick(locale, slide.imageUrlMobile, slide.imageUrlMobileEn) || undefined;
+  const desktopMime = pick(locale, slide.mimeType, slide.mimeTypeEn) || undefined;
+  const mobileMime =
+    pick(locale, slide.mimeTypeMobile, slide.mimeTypeMobileEn) || undefined;
 
   const productHref = slide.product
     ? `/urun/${slide.product.slug}`
@@ -157,9 +217,20 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
 
   useEffect(() => {
     setBgBroken(false);
-  }, [slide.id, desktopUrl, mobileUrl]);
+  }, [slide.id, desktopUrl, mobileUrl, desktopMime, mobileMime]);
 
   const showBg = Boolean(desktopUrl) && !bgBroken;
+  const bgIsVideo = isVideoMedia(desktopUrl, desktopMime);
+
+  // Video slides: slower carousel so loop can breathe
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const ms = bgIsVideo ? 12000 : 6500;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, ms);
+    return () => window.clearInterval(id);
+  }, [slides.length, bgIsVideo]);
 
   return (
     <section className="relative z-0 w-full">
@@ -173,6 +244,8 @@ export function Hero({ banners = [] }: { banners?: HeroSlide[] }) {
           <HeroBackground
             desktop={desktopUrl}
             mobile={mobileUrl}
+            desktopMime={desktopMime}
+            mobileMime={mobileMime}
             alt={title || "Banner"}
             onError={() => setBgBroken(true)}
           />

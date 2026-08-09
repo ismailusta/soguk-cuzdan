@@ -48,7 +48,7 @@ export const HeroBanners: CollectionConfig = {
               label: "Desktop banner",
               admin: {
                 description:
-                  "Önerilen: 1920×1080 (veya 1920×900). TR/EN için üstteki dil seçicisini kullanın — metin görselin içindeyse her dil ayrı yüklenir.",
+                  "JPG/PNG/WebP/AVIF veya MP4/WebM. Önerilen görsel: 1920×1080. Video: kısa, sessiz loop (max ~15–20MB). TR/EN dil seçicisi.",
               },
             },
             {
@@ -59,7 +59,7 @@ export const HeroBanners: CollectionConfig = {
               label: "Mobile banner",
               admin: {
                 description:
-                  "Önerilen: 768×1200 / 750×1334. Boşsa desktop kullanılır. Dil seçicisi ile TR/EN ayrı.",
+                  "JPG/PNG/WebP veya MP4. Önerilen: 768×1200. Boşsa desktop kullanılır.",
               },
             },
             {
@@ -68,7 +68,8 @@ export const HeroBanners: CollectionConfig = {
               localized: true,
               label: "Harici desktop URL",
               admin: {
-                description: "Upload yoksa kullanılır (CDN / Unsplash).",
+                description:
+                  "Upload yoksa (CDN). Görsel veya .mp4/.webm URL olabilir.",
               },
             },
             {
@@ -77,7 +78,7 @@ export const HeroBanners: CollectionConfig = {
               localized: true,
               label: "Harici mobile URL",
               admin: {
-                description: "Mobil upload yoksa. Boşsa desktop URL / görsel.",
+                description: "Mobil upload yoksa. Görsel veya video URL.",
               },
             },
             {

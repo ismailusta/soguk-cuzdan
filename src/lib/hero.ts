@@ -12,6 +12,11 @@ export type SubtitleSize = "sm" | "md" | "lg";
 export type TitleAlign = "left" | "center";
 export type BadgeTone = "accent" | "success" | "danger" | "muted";
 
+export type HeroMedia = {
+  url: string;
+  mimeType?: string;
+};
+
 export type HeroSlide = {
   id: string;
   title?: string;
@@ -35,6 +40,10 @@ export type HeroSlide = {
   imageUrlMobile?: string;
   /** Mobile banner EN (falls back to desktop EN / TR) */
   imageUrlMobileEn?: string;
+  mimeType?: string;
+  mimeTypeEn?: string;
+  mimeTypeMobile?: string;
+  mimeTypeMobileEn?: string;
   product?: Product | null;
   showPrice: boolean;
   layout: HeroLayout;
@@ -47,7 +56,10 @@ export type HeroSlide = {
   accentGlow: boolean;
 };
 
-type MediaLike = { url?: string | null };
+type MediaLike = {
+  url?: string | null;
+  mimeType?: string | null;
+};
 type LocalizedString = string | { tr?: string | null; en?: string | null } | null;
 type LocalizedUpload =
   | number
@@ -59,6 +71,12 @@ type LocalizedUpload =
   | null
   | undefined;
 
+export function isVideoMedia(url?: string | null, mimeType?: string | null): boolean {
+  if (mimeType && /^video\//i.test(mimeType)) return true;
+  if (!url) return false;
+  return /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
+}
+
 function pickLocale(
   value: LocalizedString,
   locale: "tr" | "en"
@@ -68,28 +86,30 @@ function pickLocale(
   return value[locale] ?? value.tr ?? value.en ?? undefined;
 }
 
-function mediaUrl(image: number | MediaLike | null | undefined): string | undefined {
+function asMedia(image: number | MediaLike | null | undefined): HeroMedia | undefined {
   if (!image || typeof image === "number") return undefined;
-  return image.url ?? undefined;
+  const url = image.url ?? undefined;
+  if (!url) return undefined;
+  return { url, mimeType: image.mimeType ?? undefined };
 }
 
-function pickLocalizedUpload(
+function pickLocalizedMedia(
   value: LocalizedUpload,
   locale: "tr" | "en"
-): string | undefined {
+): HeroMedia | undefined {
   if (value == null) return undefined;
   if (typeof value === "number") return undefined;
   if ("url" in value || (!("tr" in value) && !("en" in value))) {
-    return mediaUrl(value as MediaLike);
+    return asMedia(value as MediaLike);
   }
   const loc = value as {
     tr?: number | MediaLike | null;
     en?: number | MediaLike | null;
   };
   return (
-    mediaUrl(loc[locale] ?? undefined) ||
-    mediaUrl(loc.tr ?? undefined) ||
-    mediaUrl(loc.en ?? undefined)
+    asMedia(loc[locale] ?? undefined) ||
+    asMedia(loc.tr ?? undefined) ||
+    asMedia(loc.en ?? undefined)
   );
 }
 
@@ -113,13 +133,22 @@ function firstAny(
 
 function resolveSlot(opts: {
   imageUrl?: string;
-  uploaded?: string;
+  uploaded?: HeroMedia;
   productFallback?: string;
-}): string | undefined {
-  return (
-    firstHttp(opts.imageUrl, opts.productFallback, opts.uploaded) ||
-    firstAny(opts.imageUrl, opts.uploaded, opts.productFallback)
-  );
+}): HeroMedia | undefined {
+  const url =
+    firstHttp(opts.imageUrl, opts.productFallback, opts.uploaded?.url) ||
+    firstAny(opts.imageUrl, opts.uploaded?.url, opts.productFallback);
+  if (!url) return undefined;
+  // Prefer uploaded mime when URL matches upload; else infer later from extension
+  const mime =
+    opts.uploaded?.url &&
+    (url === opts.uploaded.url || url.includes(opts.uploaded.url))
+      ? opts.uploaded.mimeType
+      : opts.uploaded?.url === url
+        ? opts.uploaded.mimeType
+        : undefined;
+  return { url, mimeType: mime || opts.uploaded?.mimeType };
 }
 
 function resolveProduct(
@@ -133,19 +162,13 @@ export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
   const product = resolveProduct(doc.product);
   const productImg = product?.image || product?.images?.[0];
 
-  const uploadedTr = pickLocalizedUpload(
-    doc.image as LocalizedUpload,
-    "tr"
-  );
-  const uploadedEn = pickLocalizedUpload(
-    doc.image as LocalizedUpload,
-    "en"
-  );
-  const uploadedMobileTr = pickLocalizedUpload(
+  const uploadedTr = pickLocalizedMedia(doc.image as LocalizedUpload, "tr");
+  const uploadedEn = pickLocalizedMedia(doc.image as LocalizedUpload, "en");
+  const uploadedMobileTr = pickLocalizedMedia(
     doc.imageMobile as LocalizedUpload,
     "tr"
   );
-  const uploadedMobileEn = pickLocalizedUpload(
+  const uploadedMobileEn = pickLocalizedMedia(
     doc.imageMobile as LocalizedUpload,
     "en"
   );
@@ -155,27 +178,25 @@ export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
   const urlMobileTr = pickLocale(doc.imageUrlMobile as LocalizedString, "tr");
   const urlMobileEn = pickLocale(doc.imageUrlMobile as LocalizedString, "en");
 
-  const imageUrl = resolveSlot({
+  const desktopTr = resolveSlot({
     imageUrl: urlTr,
     uploaded: uploadedTr,
     productFallback: productImg,
   });
-  const imageUrlEn =
+  const desktopEn =
     resolveSlot({
       imageUrl: urlEn,
       uploaded: uploadedEn,
-    }) || imageUrl;
+    }) || desktopTr;
 
-  const imageUrlMobile =
-    resolveSlot({
-      imageUrl: urlMobileTr,
-      uploaded: uploadedMobileTr,
-    }) || undefined;
-  const imageUrlMobileEn =
-    resolveSlot({
-      imageUrl: urlMobileEn,
-      uploaded: uploadedMobileEn,
-    }) || undefined;
+  const mobileTr = resolveSlot({
+    imageUrl: urlMobileTr,
+    uploaded: uploadedMobileTr,
+  });
+  const mobileEn = resolveSlot({
+    imageUrl: urlMobileEn,
+    uploaded: uploadedMobileEn,
+  });
 
   return {
     id: String(doc.id),
@@ -192,10 +213,14 @@ export function mapHeroBanner(doc: PayloadHeroBanner): HeroSlide {
     secondaryLabel: pickLocale(doc.secondaryLabel as LocalizedString, "tr"),
     secondaryLabelEn: pickLocale(doc.secondaryLabel as LocalizedString, "en"),
     secondaryHref: doc.secondaryHref || undefined,
-    imageUrl,
-    imageUrlEn,
-    imageUrlMobile,
-    imageUrlMobileEn,
+    imageUrl: desktopTr?.url,
+    imageUrlEn: desktopEn?.url,
+    imageUrlMobile: mobileTr?.url,
+    imageUrlMobileEn: mobileEn?.url,
+    mimeType: desktopTr?.mimeType,
+    mimeTypeEn: desktopEn?.mimeType,
+    mimeTypeMobile: mobileTr?.mimeType,
+    mimeTypeMobileEn: mobileEn?.mimeType,
     product,
     showPrice: Boolean(doc.showPrice),
     layout: (doc.layout as HeroLayout) || "textOverlay",

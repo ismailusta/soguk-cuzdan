@@ -8,6 +8,9 @@ import {
   getProducts,
   getRelatedProducts,
 } from "@/lib/products";
+import {
+  getApprovedReviewsForProduct,
+} from "@/lib/reviews";
 import { faqJsonLd, productJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -58,6 +61,7 @@ export default async function ProductPage({ params }: Props) {
   if (!product) notFound();
 
   const related = await getRelatedProducts(product.brand, product.id, 8);
+  const reviews = await getApprovedReviewsForProduct(product.id);
   const faq = faqJsonLd(product.faqs ?? []);
 
   return (
@@ -71,7 +75,11 @@ export default async function ProductPage({ params }: Props) {
           { name: product.name, path: `/urun/${product.slug}` },
         ])}
       />
-      <ProductDetail product={product} related={related} />
+      <ProductDetail
+        product={product}
+        related={related}
+        reviews={reviews}
+      />
     </>
   );
 }

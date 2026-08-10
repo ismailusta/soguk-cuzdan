@@ -13,8 +13,13 @@ import { formatPrice } from "@/lib/money";
 import type { Product } from "@/lib/types";
 import { AddToCartButton } from "./AddToCartButton";
 import { ProductCard } from "./ProductCard";
+import {
+  ProductReviewsSection,
+  ReviewRatingBadge,
+} from "./ProductReviews";
 import { ProductVisual } from "./ProductVisual";
 import { RichText } from "./RichText";
+import type { ProductReviewPublic } from "@/lib/reviews-shared";
 
 const DEFAULT_FAQS_TR = [
   {
@@ -99,9 +104,11 @@ function Accordion({
 export function ProductDetail({
   product,
   related = [],
+  reviews = [],
 }: {
   product: Product;
   related?: Product[];
+  reviews?: ProductReviewPublic[];
 }) {
   const { locale, t } = useLocale();
 
@@ -185,6 +192,7 @@ export function ProductDetail({
             <h1 className="mb-4 max-w-full [overflow-wrap:anywhere] break-words text-[28px] font-bold tracking-[-0.5px] md:text-[34px]">
               {productName(product, locale)}
             </h1>
+            <ReviewRatingBadge reviews={reviews} />
             <div className="mb-6 flex flex-wrap items-baseline gap-3">
               <span className="text-[30px] font-bold tabular-nums">
                 {formatPrice(product.price, product.currency)}
@@ -266,6 +274,11 @@ export function ProductDetail({
           </div>
         </div>
       </section>
+
+      <ProductReviewsSection
+        productId={product.id}
+        initialReviews={reviews}
+      />
 
       {related.length > 0 && (
         <section className="border-t border-line bg-bg-nav/30">

@@ -13,6 +13,7 @@ import { Media } from "./collections/Media";
 import { Customers } from "./collections/Customers";
 import { HeroBanners } from "./collections/HeroBanners";
 import { Orders } from "./collections/Orders";
+import { ProductReviews } from "./collections/ProductReviews";
 import { Products } from "./collections/Products";
 import { Users } from "./collections/Users";
 import { SiteSettings } from "./globals/SiteSettings";
@@ -93,7 +94,7 @@ export default buildConfig({
       titleSuffix: "· Kriptostore",
     },
   },
-  collections: [Users, Customers, Media, Products, Orders, HeroBanners],
+  collections: [Users, Customers, Media, Products, Orders, ProductReviews, HeroBanners],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   secret: payloadSecret,

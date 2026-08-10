@@ -73,6 +73,7 @@ export interface Config {
     media: Media;
     products: Product;
     orders: Order;
+    'product-reviews': ProductReview;
     'hero-banners': HeroBanner;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -86,6 +87,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    'product-reviews': ProductReviewsSelect<false> | ProductReviewsSelect<true>;
     'hero-banners': HeroBannersSelect<false> | HeroBannersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -214,6 +216,9 @@ export interface Customer {
  */
 export interface Media {
   id: number;
+  /**
+   * Görsel/video açıklaması (erişilebilirlik).
+   */
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -224,8 +229,6 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -256,11 +259,17 @@ export interface Product {
     [k: string]: unknown;
   };
   /**
-   * Örn. Cihaz hakkında, Kutuda ne var, Nasıl kullanılır
+   * Her bölüm: Başlık + Detay. TR/EN için üstteki dil seçicisini kullan.
    */
   detailSections?:
     | {
+        /**
+         * Sitede bölüm başlığı olur. Varsayılan: Cihaz hakkında
+         */
         title: string;
+        /**
+         * Kalın yazı, liste, link. Sitede başlığın altında çıkar.
+         */
         body: {
           root: {
             type: string;
@@ -373,6 +382,33 @@ export interface Order {
   createdAt: string;
 }
 /**
+ * Onaylı (approved) yorumlar sitede görünür. Kullanıcı yorumları pending gelir — buradan onayla.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reviews".
+ */
+export interface ProductReview {
+  id: number;
+  product: number | Product;
+  rating: number;
+  title?: string | null;
+  body: string;
+  authorName: string;
+  /**
+   * Boşsa seed / manuel yorum olabilir.
+   */
+  customer?: (number | null) | Customer;
+  status: 'pending' | 'approved' | 'rejected';
+  /**
+   * Seed yorumlarda ‘satın aldı’ rozeti gösterilmez.
+   */
+  source: 'user' | 'seed';
+  locale?: ('tr' | 'en') | null;
+  verifiedPurchase?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Anasayfa hero slide’ları. Sadece görsel de ekleyebilirsin — başlık/CTA zorunlu değil. Sıra: küçük sayı önce.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -386,19 +422,19 @@ export interface HeroBanner {
    */
   order?: number | null;
   /**
-   * Önerilen: 1920×1080 (veya 1920×900). TR/EN için üstteki dil seçicisini kullanın — metin görselin içindeyse her dil ayrı yüklenir.
+   * JPG/PNG/WebP/AVIF veya MP4/WebM. Önerilen görsel: 1920×1080. Video: kısa, sessiz loop (max ~15–20MB). TR/EN dil seçicisi.
    */
   image?: (number | null) | Media;
   /**
-   * Önerilen: 768×1200 / 750×1334. Boşsa desktop kullanılır. Dil seçicisi ile TR/EN ayrı.
+   * JPG/PNG/WebP veya MP4. Önerilen: 768×1200. Boşsa desktop kullanılır.
    */
   imageMobile?: (number | null) | Media;
   /**
-   * Upload yoksa kullanılır (CDN / Unsplash).
+   * Upload yoksa (CDN). Görsel veya .mp4/.webm URL olabilir.
    */
   imageUrl?: string | null;
   /**
-   * Mobil upload yoksa. Boşsa desktop URL / görsel.
+   * Mobil upload yoksa. Görsel veya video URL.
    */
   imageUrlMobile?: string | null;
   /**
@@ -609,8 +645,6 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -688,6 +722,24 @@ export interface OrdersSelect<T extends boolean = true> {
         quantity?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-reviews_select".
+ */
+export interface ProductReviewsSelect<T extends boolean = true> {
+  product?: T;
+  rating?: T;
+  title?: T;
+  body?: T;
+  authorName?: T;
+  customer?: T;
+  status?: T;
+  source?: T;
+  locale?: T;
+  verifiedPurchase?: T;
   updatedAt?: T;
   createdAt?: T;
 }

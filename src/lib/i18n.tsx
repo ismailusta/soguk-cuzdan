@@ -82,7 +82,7 @@ const dict = {
     inStock: "Stokta",
     productCount: "ürün",
     noMatch: "Bu filtreye uygun ürün yok.",
-    searchPlaceholder: "Ürün, marka veya model ara…",
+    searchPlaceholder: "Ürün, marka, model veya SN ara…",
     searchInBrand: "içinde ara",
     searchAll: "Tüm ürünlerde ara",
     catalogLead:
@@ -201,7 +201,7 @@ const dict = {
     inStock: "In stock",
     productCount: "products",
     noMatch: "No products match this filter.",
-    searchPlaceholder: "Search product, brand or model…",
+    searchPlaceholder: "Search product, brand, model or SN…",
     searchInBrand: "search in",
     searchAll: "Search all products",
     catalogLead:

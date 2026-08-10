@@ -49,6 +49,7 @@ export function ProductFilters({
           p.brand,
           productShort(p, locale),
           p.slug,
+          p.sku || "",
           ...(p.features || []),
         ].join(" ")
       );

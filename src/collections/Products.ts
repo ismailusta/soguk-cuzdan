@@ -1,4 +1,56 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionBeforeValidateHook, CollectionConfig } from "payload";
+import {
+  generateProductSn,
+  isValidProductSn,
+  normalizeProductSn,
+} from "@/lib/product-sn";
+
+const ensureSku: CollectionBeforeValidateHook = async ({
+  data,
+  req,
+  originalDoc,
+}) => {
+  if (!data) return data;
+
+  const raw = typeof data.sku === "string" ? data.sku : "";
+  let sku = normalizeProductSn(raw);
+
+  if (!sku) {
+    for (let i = 0; i < 8; i++) {
+      const candidate = generateProductSn();
+      const existing = await req.payload.find({
+        collection: "products",
+        where: { sku: { equals: candidate } },
+        limit: 1,
+        depth: 0,
+        overrideAccess: true,
+      });
+      if (!existing.docs.length) {
+        sku = candidate;
+        break;
+      }
+    }
+    if (!sku) sku = generateProductSn();
+  } else if (!isValidProductSn(sku)) {
+    throw new Error(
+      "Ürün kodu SN-XXXXXXXXX formatında olmalı (örn. SN-A7K2M9X4Q)."
+    );
+  } else {
+    const existing = await req.payload.find({
+      collection: "products",
+      where: { sku: { equals: sku } },
+      limit: 2,
+      depth: 0,
+      overrideAccess: true,
+    });
+    const selfId = originalDoc?.id ?? data.id;
+    const clash = existing.docs.find((d) => String(d.id) !== String(selfId));
+    if (clash) throw new Error(`Ürün kodu zaten kullanılıyor: ${sku}`);
+  }
+
+  data.sku = sku;
+  return data;
+};
 
 export const Products: CollectionConfig = {
   slug: "products",
@@ -6,6 +58,7 @@ export const Products: CollectionConfig = {
     useAsTitle: "name",
     defaultColumns: [
       "name",
+      "sku",
       "brand",
       "price",
       "stockQty",
@@ -17,6 +70,9 @@ export const Products: CollectionConfig = {
   access: {
     read: () => true,
   },
+  hooks: {
+    beforeValidate: [ensureSku],
+  },
   fields: [
     {
       name: "name",
@@ -24,6 +80,19 @@ export const Products: CollectionConfig = {
       required: true,
       localized: true,
       label: "Ad",
+    },
+    {
+      name: "sku",
+      type: "text",
+      required: true,
+      unique: true,
+      index: true,
+      label: "Ürün kodu (SN)",
+      admin: {
+        position: "sidebar",
+        description:
+          "Benzersiz stok kodu. Boş bırakırsan otomatik SN-XXXXXXXXX üretilir.",
+      },
     },
     {
       name: "slug",
@@ -156,7 +225,8 @@ export const Products: CollectionConfig = {
       label: "Stokta (görünür)",
       admin: {
         position: "sidebar",
-        description: "false ise satışa kapalı. stockQty 0 olunca otomatik kapanır.",
+        description:
+          "false ise satışa kapalı. stockQty 0 olunca otomatik kapanır.",
       },
     },
     {

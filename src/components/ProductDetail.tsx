@@ -189,9 +189,14 @@ export function ProductDetail({
             <p className="mb-3.5 text-[13px] font-semibold tracking-[1.5px] text-accent uppercase">
               {product.brand}
             </p>
-            <h1 className="mb-4 max-w-full [overflow-wrap:anywhere] break-words text-[28px] font-bold tracking-[-0.5px] md:text-[34px]">
+            <h1 className="mb-2 max-w-full [overflow-wrap:anywhere] break-words text-[28px] font-bold tracking-[-0.5px] md:text-[34px]">
               {productName(product, locale)}
             </h1>
+            {product.sku ? (
+              <p className="mb-4 font-mono text-[12px] tracking-[0.08em] text-fg-dim">
+                {product.sku}
+              </p>
+            ) : null}
             <ReviewRatingBadge reviews={reviews} />
             <div className="mb-6 flex flex-wrap items-baseline gap-3">
               <span className="text-[30px] font-bold tabular-nums">

@@ -78,7 +78,7 @@ export function productJsonLd(product: Product) {
       product.shortDescription ||
       lexicalPlaintext(product.description) ||
       `${product.name} — ${product.brand}`,
-    sku: product.slug,
+    sku: product.sku || product.slug,
     brand: {
       "@type": "Brand",
       name: product.brand,

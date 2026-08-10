@@ -237,6 +237,10 @@ export interface Media {
 export interface Product {
   id: number;
   name: string;
+  /**
+   * Benzersiz stok kodu. Boş bırakırsan otomatik SN-XXXXXXXXX üretilir.
+   */
+  sku: string;
   slug: string;
   brand: string;
   shortDescription: string;
@@ -652,6 +656,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ProductsSelect<T extends boolean = true> {
   name?: T;
+  sku?: T;
   slug?: T;
   brand?: T;
   shortDescription?: T;

@@ -157,6 +157,7 @@ export function mapProduct(doc: PayloadProduct): Product {
 
   return {
     id: String(doc.id),
+    sku: typeof doc.sku === "string" && doc.sku ? doc.sku : undefined,
     slug: doc.slug,
     name,
     nameEn,

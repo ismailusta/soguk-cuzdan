@@ -2,6 +2,7 @@ import type { RichTextValue } from "@/lib/lexical";
 
 export type Product = {
   id: string;
+  sku?: string;
   slug: string;
   name: string;
   nameEn?: string;

@@ -157,7 +157,6 @@ export function ProductReviewsSection({
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as {
           reviews?: ProductReviewPublic[];
-          summary?: ReviewSummary;
           canReview?: boolean;
           alreadyReviewed?: boolean;
           loggedIn?: boolean;

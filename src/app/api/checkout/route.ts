@@ -25,6 +25,18 @@ type CheckoutBody = {
 };
 
 export async function POST(request: Request) {
+  // Cryptomus merchant keys henüz canlı değil — UI popup kullanıyor.
+  if (process.env.CRYPTOMUS_CHECKOUT_ENABLED !== "true") {
+    return NextResponse.json(
+      {
+        error:
+          "Cryptomus entegrasyonu bekleniyor. Ödeme yakında açılacak.",
+        pending: true,
+      },
+      { status: 503 }
+    );
+  }
+
   try {
     const rl = rateLimit(`checkout:${clientIp(request)}`, 20, 60_000);
     if (!rl.ok) {

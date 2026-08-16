@@ -11,11 +11,11 @@ type Coin = "BTC" | "ETH" | "USDT";
 
 export default function CheckoutPage() {
   const { user } = useAuth();
-  const { items, clear, ready: cartReady } = useCart();
+  const { items, ready: cartReady } = useCart();
   const { getById, ready: productsReady } = useProducts();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coin, setCoin] = useState<Coin>("BTC");
+  const [pendingOpen, setPendingOpen] = useState(false);
 
   const lines = useMemo(() => {
     return items
@@ -39,7 +39,7 @@ export default function CheckoutPage() {
 
   const total = lines.reduce((s, l) => s + l.price * l.quantity, 0);
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
@@ -48,45 +48,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    const form = new FormData(e.currentTarget);
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          preferredCoin: coin,
-          items: lines.map((l) => ({
-            productId: l.productId,
-            quantity: l.quantity,
-          })),
-          customer: {
-            name: String(form.get("name") || ""),
-            email: String(form.get("email") || ""),
-            phone: String(form.get("phone") || ""),
-            address: String(form.get("address") || ""),
-            city: String(form.get("city") || ""),
-            note: String(form.get("note") || ""),
-          },
-        }),
-      });
-
-      const data = (await res.json()) as {
-        paymentUrl?: string;
-        error?: string;
-      };
-
-      if (!res.ok || !data.paymentUrl) {
-        throw new Error(data.error || "Ödeme başlatılamadı.");
-      }
-
-      clear();
-      window.location.href = data.paymentUrl;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Bir hata oluştu.");
-      setLoading(false);
-    }
+    // Cryptomus API henüz canlı değil — gerçek checkout kapalı.
+    setPendingOpen(true);
   }
 
   if (!cartReady || !productsReady) {
@@ -264,18 +227,12 @@ export default function CheckoutPage() {
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full font-bold"
-            >
-              {loading
-                ? "Cryptomus açılıyor…"
-                : `${coin} ile Cryptomus’ta öde`}
+            <button type="submit" className="btn-primary w-full font-bold">
+              {coin} ile öde
             </button>
             <p className="text-center text-xs leading-relaxed text-fg-faint">
-              Ödeme Cryptomus üzerinden tamamlanır. Seçtiğiniz coin ödeme
-              sayfasında tercih olarak kullanılır.
+              Canlı Cryptomus ödemesi yakında açılacak. Şimdilik ödeme altyapısı
+              hazırlık aşamasında.
             </p>
           </form>
         </div>
@@ -285,8 +242,8 @@ export default function CheckoutPage() {
             <p className="mb-4 text-[13px] tracking-[1px] text-fg-dim uppercase">
               {coin} ile ödeme
             </p>
-            <div className="mx-auto flex h-[200px] w-[200px] items-center justify-center rounded-2xl border border-line bg-bg-nav text-sm text-fg-dim">
-              Cryptomus QR
+            <div className="mx-auto flex h-[200px] w-[200px] items-center justify-center rounded-2xl border border-line bg-bg-nav px-4 text-center text-sm text-fg-dim">
+              Cryptomus entegrasyonu bekleniyor
             </div>
             <div className="mt-5 rounded-xl bg-bg-nav p-3.5">
               <div className="mb-1 text-xs text-fg-dim">Ödeme</div>
@@ -295,12 +252,48 @@ export default function CheckoutPage() {
               </div>
             </div>
             <p className="mt-4 text-xs leading-relaxed text-fg-faint">
-              Formu gönderince Cryptomus ödeme sayfasına yönlendirilirsiniz.
-              Onay sonrası sipariş otomatik işlenir.
+              API anahtarları onaylanınca Cryptomus ödeme sayfası buradan
+              açılacak.
             </p>
           </div>
         </aside>
       </div>
+
+      {pendingOpen ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/65 px-5"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cryptomus-pending-title"
+          onClick={() => setPendingOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-[20px] border border-line bg-bg-elevated p-7 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="mb-2 text-[12px] tracking-[1.2px] text-accent uppercase">
+              Ödeme
+            </p>
+            <h2
+              id="cryptomus-pending-title"
+              className="text-[22px] font-bold tracking-tight"
+            >
+              Cryptomus entegrasyonu bekleniyor
+            </h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">
+              Ödeme altyapısı hazır. Merchant API anahtarları onaylanıp
+              tanımlandığında kripto ödemeler burada açılacak.
+            </p>
+            <button
+              type="button"
+              className="btn-primary mt-7 w-full font-bold"
+              onClick={() => setPendingOpen(false)}
+            >
+              Anladım
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

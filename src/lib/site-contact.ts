@@ -26,6 +26,7 @@ export type SiteContact = {
   privacy: LegalPageContent;
   terms: LegalPageContent;
   returns: LegalPageContent;
+  shipping: LegalPageContent;
   kvkk: LegalPageContent;
 };
 
@@ -91,6 +92,20 @@ const returnsEn = [
   "Request returns via the contact form or support email with your order ID. Approved refunds are processed via Cryptomus / the payment channel.",
 ].join("\n\n");
 
+const shippingTr = [
+  "Ödeme Cryptomus ile onaylandıktan sonra sipariş hazırlanır ve Türkiye içi kargo süreci başlar.",
+  "Kargo ücretsizdir (aksi ürün sayfasında belirtilmedikçe). Teslimat süresi stoğa ve şehirlere göre genelde birkaç iş günü içinde başlar.",
+  "Yurtdışı teslimat özel talep ile değerlendirilir; standart vitrin satışı Türkiye teslimatına göredir.",
+  "Takip numarası e-posta ile iletilir. Adres hatalarından doğan gecikmeler için destek kanalımızla iletişime geçin.",
+].join("\n\n");
+
+const shippingEn = [
+  "After Cryptomus confirms payment, we prepare the order and start domestic shipping in Turkey.",
+  "Shipping is free unless stated otherwise on the product page. Dispatch typically begins within a few business days depending on stock and city.",
+  "International shipping is by special request; the standard storefront ships to Turkey.",
+  "Tracking is emailed when available. Contact support for delays caused by incorrect addresses.",
+].join("\n\n");
+
 const kvkkTr = [
   "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında; ad, e-posta, telefon ve teslimat adresi sipariş süreçleri için işlenir.",
   "Amaç: sözleşme ifası, müşteri desteği ve yasal zorunluluklar.",
@@ -143,6 +158,12 @@ export const DEFAULT_SITE_CONTACT: SiteContact = {
     "Refund Policy",
     returnsTr,
     returnsEn
+  ),
+  shipping: legal(
+    "Kargo politikası (Shipping Policy)",
+    "Shipping Policy",
+    shippingTr,
+    shippingEn
   ),
   kvkk: legal("KVKK bilgilendirme", "Privacy notice (KVKK)", kvkkTr, kvkkEn),
 };

@@ -202,6 +202,31 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "Kargo (Shipping)",
+          fields: [
+            {
+              name: "shippingTitle",
+              type: "text",
+              label: "Başlık",
+              localized: true,
+              defaultValue: "Kargo politikası (Shipping Policy)",
+            },
+            {
+              name: "shippingBody",
+              type: "richText",
+              label: "Metin",
+              localized: true,
+              admin: { description: richHint },
+              defaultValue: paragraphsToLexical(
+                "Ödeme Cryptomus ile onaylandıktan sonra sipariş hazırlanır ve Türkiye içi kargo süreci başlar.",
+                "Kargo ücretsizdir (aksi ürün sayfasında belirtilmedikçe). Teslimat süresi stoğa ve şehirlere göre genelde birkaç iş günü içinde başlar.",
+                "Yurtdışı teslimat özel talep ile değerlendirilir; standart vitrin satışı Türkiye teslimatına göredir.",
+                "Takip numarası e-posta ile iletilir. Adres hatalarından doğan gecikmeler için destek kanalımızla iletişime geçin."
+              ),
+            },
+          ],
+        },
+        {
           label: "KVKK",
           fields: [
             {

@@ -11,7 +11,7 @@ import {
   pickRichLocale,
 } from "@/lib/site-contact";
 
-type LegalKey = "privacy" | "terms" | "returns" | "kvkk";
+type LegalKey = "privacy" | "terms" | "returns" | "shipping" | "kvkk";
 
 export function LegalPage({
   kind,

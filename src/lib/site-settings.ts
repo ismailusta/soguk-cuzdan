@@ -123,6 +123,11 @@ export async function getSiteSettings(): Promise<SiteContact> {
         doc.returnsBody,
         DEFAULT_SITE_CONTACT.returns
       ),
+      shipping: asLegal(
+        doc.shippingTitle,
+        doc.shippingBody,
+        DEFAULT_SITE_CONTACT.shipping
+      ),
       kvkk: asLegal(doc.kvkkTitle, doc.kvkkBody, DEFAULT_SITE_CONTACT.kvkk),
     };
   } catch {

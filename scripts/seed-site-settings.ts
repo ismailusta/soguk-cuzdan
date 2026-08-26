@@ -49,6 +49,8 @@ async function upsertLocale(
       termsBody: d.terms.body[L],
       returnsTitle: d.returns.title[L],
       returnsBody: d.returns.body[L],
+      shippingTitle: d.shipping.title[L],
+      shippingBody: d.shipping.body[L],
       kvkkTitle: d.kvkk.title[L],
       kvkkBody: d.kvkk.body[L],
     },

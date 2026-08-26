@@ -57,6 +57,9 @@ export function Footer({ contact }: { contact: SiteContact }) {
                 <Link href="/refund" className="hover:text-accent">
                   {t.returns}
                 </Link>
+                <Link href="/shipping" className="hover:text-accent">
+                  {t.shipping}
+                </Link>
                 <Link href="/kvkk" className="hover:text-accent">
                   {t.kvkk}
                 </Link>
@@ -71,6 +74,9 @@ export function Footer({ contact }: { contact: SiteContact }) {
                 </Link>
                 <Link href="/iade" className="hover:text-accent">
                   {t.returns}
+                </Link>
+                <Link href="/kargo" className="hover:text-accent">
+                  {t.shipping}
                 </Link>
                 <Link href="/kvkk" className="hover:text-accent">
                   {t.kvkk}

@@ -91,9 +91,25 @@ export function ContactPageView({ contact }: { contact: SiteContact }) {
               <p className="mt-1">{hours}</p>
             </div>
           ) : null}
-          <p>
+          {pickLocale(contact.productOrigin, locale) ? (
+            <div>
+              <p className="text-xs tracking-wider text-fg-faint uppercase">
+                {locale === "en" ? "Product origin" : "Ürün kaynağı"}
+              </p>
+              <p className="mt-1 leading-relaxed">
+                {pickLocale(contact.productOrigin, locale)}
+              </p>
+            </div>
+          ) : null}
+          <p className="flex flex-wrap gap-x-3 gap-y-1">
             <Link href="/iade" className="text-accent hover:underline">
               {t.returns} →
+            </Link>
+            <Link
+              href={locale === "en" ? "/shipping" : "/kargo"}
+              className="text-accent hover:underline"
+            >
+              {t.shipping} →
             </Link>
           </p>
         </aside>
